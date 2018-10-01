@@ -20,9 +20,10 @@ ONBUILD RUN mkdir /buildfs \
          && apk --no-cache --root /buildfs --virtual .rundeps add $RUNDEPS \
          && apk --no-cache --root /buildfs --allow-untrusted --virtual .rundeps_untrusted add $RUNDEPS_UNTRUSTED \
          && cp -a /buildfs/* /imagefs/ \
-         && [ -d "/tmp/buildfs" ] && cp -a /tmp/buildfs / || /bin/true \
+         && [ -d "/tmp/rootfs" ] && cp -a /tmp/rootfs/* /buildfs/ || /bin/true \
+         && [ -d "/tmp/buildfs" ] && cp -a /tmp/buildfs/* /buildfs/ || /bin/true \
          && apk --no-cache --root /buildfs --virtual .builddeps add $BUILDDEPS \
          && apk --no-cache --root /buildfs --allow-untrusted --virtual .builddeps_untrusted add $BUILDDEPS_UNTRUSTED \
          && eval "$RUNCMDS" \
-         && [ -d "/tmp/imagefs" ] && cp -a /tmp/imagefs / || /bin/true \
+         && [ -d "/tmp/rootfs" ] && cp -a /tmp/rootfs/* /imagefs/ || /bin/true \
          && rm -rf /tmp/* /imagefs/lib/apk /imagefs/etc/apk
