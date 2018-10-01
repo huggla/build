@@ -7,8 +7,8 @@ ONBUILD ARG RUNDEPS
 ONBUILD ARG RUNDEPS_UNTRUSTED
 ONBUILD ARG BUILDCMDS
 
-ONBUILD COPY --from=baseimage / /
-ONBUILD COPY --from=baseimage / /imagefs/
+ONBUILD COPY --from=init / /
+ONBUILD COPY --from=init / /imagefs/
 ONBUILD COPY ./* /tmp/
 
 ONBUILD RUN mkdir /buildfs \
