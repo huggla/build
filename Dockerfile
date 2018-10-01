@@ -26,4 +26,4 @@ ONBUILD RUN mkdir /buildfs \
          && apk --no-cache --root /buildfs --allow-untrusted --virtual .builddeps_untrusted add $BUILDDEPS_UNTRUSTED \
          && eval "$RUNCMDS" \
          && [ -d "/tmp/rootfs" ] && cp -a /tmp/rootfs/* /imagefs/ || /bin/true \
-         && rm -rf /tmp/* /imagefs/lib/apk /imagefs/etc/apk /buildfs
+         && rm -rf /tmp/* /imagefs/tmp/* /imagefs/lib/apk /imagefs/etc/apk /buildfs
