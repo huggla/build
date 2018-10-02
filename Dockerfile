@@ -6,6 +6,7 @@ ONBUILD ARG BUILDDEPS_UNTRUSTED
 ONBUILD ARG RUNDEPS
 ONBUILD ARG RUNDEPS_UNTRUSTED
 ONBUILD ARG MAKEDIRS
+ONBUILD ARG REMOVEFILES
 ONBUILD ARG BUILDCMDS
 
 ONBUILD COPY --from=init / /
@@ -27,4 +28,4 @@ ONBUILD RUN mkdir -p /buildfs $MAKEDIRS \
          && apk --no-cache --root /buildfs --allow-untrusted --virtual .builddeps_untrusted add $BUILDDEPS_UNTRUSTED \
          && eval "$RUNCMDS" \
          && [ -d "/tmp/rootfs" ] && cp -a /tmp/rootfs/* /imagefs/ || /bin/true \
-         && rm -rf /tmp/* /imagefs/tmp/* /imagefs/lib/apk /imagefs/etc/apk /buildfs
+         && rm -rf /tmp/* /imagefs/tmp/* /imagefs/lib/apk /imagefs/etc/apk /buildfs $REMOVEFILES
