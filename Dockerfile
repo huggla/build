@@ -5,13 +5,14 @@ ONBUILD ARG BUILDDEPS
 ONBUILD ARG BUILDDEPS_UNTRUSTED
 ONBUILD ARG RUNDEPS
 ONBUILD ARG RUNDEPS_UNTRUSTED
+ONBUILD ARG MAKEDIRS
 ONBUILD ARG BUILDCMDS
 
 ONBUILD COPY --from=init / /
 ONBUILD COPY --from=init / /imagefs/
 ONBUILD COPY ./* /tmp/
 
-ONBUILD RUN mkdir /buildfs \
+ONBUILD RUN mkdir -p /buildfs $MAKEDIRS \
          && tar -xvp -f /apk-tool.tar -C / \
          && tar -xvp -f /apk-tool.tar -C /buildfs/ \
          && rm -rf /apk-tool.tar \
