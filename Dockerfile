@@ -26,7 +26,7 @@ ONBUILD RUN set -e \
          && rm -f /apk-tool.tar \
          && while read file; \
             do \
-               mkdir -p "$(dirname $file)"; \
+               mkdir -p "/buildfs$(dirname $file)"; \
                ln -sf "$file" "/buildfs$file"; \
             done < /apk-tool.filelist \
          && echo $ADDREPOS >> /buildfs/etc/apk/repositories \
