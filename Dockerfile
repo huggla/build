@@ -40,7 +40,7 @@ ONBUILD RUN set -e \
          && chmod +x /usr/sbin/relpath \
          && for exe in $EXECUTABLES; \
             do \
-               exe="/imagefs$exe"
+               exe="/imagefs$exe"; \
                exeDir="$(dirname "$exe")"; \
                if [ "$exeDir" != "/usr/local/bin" ]; \
                then \
