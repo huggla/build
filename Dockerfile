@@ -47,7 +47,7 @@ ONBUILD RUN set -e \
                   exeName="$(basename "$exe")"; \
                   cp -a "$exe" "/imagefs/usr/local/bin/"; \
                   cd "$exeDir"; \
-                  ln -sf "$(relpath "$exe" "/imagefs/usr/local/bin/$exeName")" "$exeName"; \
+                  ln -sf "$(relpath "$exeDir" "/imagefs/usr/local/bin")/$exeName" "$exeName"; \
                fi; \
             done
          
