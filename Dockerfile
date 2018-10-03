@@ -51,5 +51,6 @@ ONBUILD RUN set -e \
                fi; \
             done \
          && chmod o= /imagefs/usr/local/bin/* /tmp \
-         && chmod go= /imagefs/bin /imagefs/sbin /imagefs/usr/bin /imagefs/usr/sbin
+         && chmod go= /imagefs/bin /imagefs/sbin /imagefs/usr/bin /imagefs/usr/sbin \
+         && rm -rf /imagefs/sys /imagefs/dev /imagefs/proc
          
