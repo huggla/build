@@ -17,7 +17,7 @@ ONBUILD COPY --from=init / /imagefs/
 ONBUILD COPY ./* /tmp/
 
 ONBUILD RUN set -e \
-         && mkdir -p /buildfs /imagefs/usr/local/bin \
+         && mkdir -p /buildfs /imagefs/bin /imagefs/sbin /imagefs/usr/bin /imagefs/usr/sbin /imagefs/usr/local/bin \
          && for dir in $MAKEDIRS; \
             do \
                mkdir -p "$dir" "/imagefs$dir"; \
@@ -50,5 +50,6 @@ ONBUILD RUN set -e \
                   ln -sf "$(relpath "$exeDir" "/imagefs/usr/local/bin")/$exeName" "$exeName"; \
                fi; \
             done \
-         && chmod o= /imagefs/usr/local/bin/*
+         && chmod o= /imagefs/usr/local/bin/* \
+         && chmod go= /imagefs/bin /imagefs/sbin /imagefs/usr/bin /imagefs/usr/sbin
          
