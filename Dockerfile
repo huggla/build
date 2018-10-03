@@ -16,7 +16,11 @@ ONBUILD COPY --from=init / /
 ONBUILD COPY --from=init / /imagefs/
 ONBUILD COPY ./* /tmp/
 
-ONBUILD RUN mkdir -p /buildfs /imagefs/usr/local/bin $MAKEDIRS \
+ONBUILD RUN mkdir -p /buildfs /imagefs/usr/local/bin \
+         && for dir in "$MAKEDIRS"; \
+            do \
+               mkdir -p "$dir" "/imagefs$dir"; \
+            done \
          && tar -xvp -f /apk-tool.tar -C / \
          && tar -xvp -f /apk-tool.tar -C /buildfs/ \
          && rm -rf /apk-tool.tar \
