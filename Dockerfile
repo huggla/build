@@ -16,7 +16,8 @@ ONBUILD COPY --from=init / /
 ONBUILD COPY --from=init / /imagefs/
 ONBUILD COPY ./* /tmp/
 
-ONBUILD RUN mkdir -p /buildfs /imagefs/usr/local/bin \
+ONBUILD RUN set -e \
+         && mkdir -p /buildfs /imagefs/usr/local/bin \
          && for dir in $MAKEDIRS; \
             do \
                mkdir -p "$dir" "/imagefs$dir"; \
@@ -28,9 +29,7 @@ ONBUILD RUN mkdir -p /buildfs /imagefs/usr/local/bin \
          && apk --no-cache --root /buildfs add --initdb \
          && apk --no-cache --root /buildfs --virtual .rundeps add $RUNDEPS \
          && apk --no-cache --root /buildfs --allow-untrusted --virtual .rundeps_untrusted add $RUNDEPS_UNTRUSTED \
-         && ls -la /buildfs/usr/bin \
          && cp -a /buildfs/* /imagefs/ \
-         && ls -la /imagefs/usr/bin \
          && [ -d "/tmp/rootfs" ] && cp -a /tmp/rootfs/* /buildfs/ || /bin/true \
          && [ -d "/tmp/buildfs" ] && cp -a /tmp/buildfs/* /buildfs/ || /bin/true \
          && apk --no-cache --root /buildfs --virtual .builddeps add $BUILDDEPS \
@@ -41,6 +40,7 @@ ONBUILD RUN mkdir -p /buildfs /imagefs/usr/local/bin \
          && chmod +x /usr/sbin/relpath \
          && for exe in $EXECUTABLES; \
             do \
+               exe="/imagefs$exe"
                exeDir="$(dirname "$exe")"; \
                if [ "$exeDir" != "/usr/local/bin" ]; \
                then \
