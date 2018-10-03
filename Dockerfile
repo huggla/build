@@ -2,8 +2,6 @@ FROM huggla/apk-tool
 
 COPY ./rootfs /
 
-RUN chmod +x /usr/sbin/relpath
-
 ONBUILD ARG ADDREPOS
 ONBUILD ARG BUILDDEPS
 ONBUILD ARG BUILDDEPS_UNTRUSTED
@@ -34,6 +32,7 @@ ONBUILD RUN mkdir -p /buildfs /imagefs/usr/local/bin $MAKEDIRS \
          && eval "$RUNCMDS" \
          && [ -d "/tmp/rootfs" ] && cp -a /tmp/rootfs/* /imagefs/ || /bin/true \
          && rm -rf /tmp/* /imagefs/tmp/* /imagefs/lib/apk /imagefs/etc/apk /buildfs $REMOVEFILES \
+         && chmod +x /usr/sbin/relpath \
          && for exe in "$EXECUTABLES"; \
             do \
                exeDir="$(dirname "$exe")"; \
