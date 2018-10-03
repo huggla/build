@@ -50,6 +50,5 @@ ONBUILD RUN set -e \
                   ln -sf "$(relpath "$exeDir" "/imagefs/usr/local/bin")/$exeName" "$exeName"; \
                fi; \
             done \
-         && chmod o= /imagefs/usr/local/bin/* \
-         && chmod u+s,o+rx /imagefs/usr/local/bin/sudo
+         && chmod o= /imagefs/usr/local/bin/*
          
