@@ -24,8 +24,8 @@ ONBUILD RUN set -e \
             done \
          && tar -xvp -f /apk-tool.tar -C / \
          && tar -xvp -f /apk-tool.tar -C /buildfs/ \
-         && rm -rf /apk-tool.tar \
          && cat /apk-tool.filelist | xargs rm -rf \
+         && rm -f /apk-tool.tar /apk-tool.filelist \
          && echo $ADDREPOS >> /buildfs/etc/apk/repositories \
          && apk --no-cache --root /buildfs add --initdb \
          && apk --no-cache --root /buildfs --virtual .rundeps add $RUNDEPS \
