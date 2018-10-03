@@ -1,5 +1,9 @@
 FROM huggla/apk-tool
 
+COPY ./rootfs /
+
+RUN chmod +x /usr/sbin/relpath
+
 ONBUILD ARG ADDREPOS
 ONBUILD ARG BUILDDEPS
 ONBUILD ARG BUILDDEPS_UNTRUSTED
