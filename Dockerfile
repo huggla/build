@@ -51,6 +51,7 @@ ONBUILD RUN set -e \
             done \
          && chmod o= /imagefs/usr/local/bin/* /tmp \
          && chmod go= /imagefs/bin /imagefs/sbin /imagefs/usr/bin /imagefs/usr/sbin \
+         && cat /apk-tool.filelist | awk '{print "/imagefs"$1}' > /imagefs/apa \
          && cat /apk-tool.filelist | awk '{print "/imagefs"$1}' | xargs rm -rf \
          && set +e \
          && rm -rf $REMOVEFILES /imagefs/sys /imagefs/dev /imagefs/proc /tmp/* /imagefs/tmp/* /imagefs/lib/apk /imagefs/etc/apk /imagefs/var/cache/apk/* /buildfs
