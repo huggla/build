@@ -17,7 +17,7 @@ ONBUILD COPY --from=init / /imagefs/
 ONBUILD COPY ./* /tmp/
 
 ONBUILD RUN mkdir -p /buildfs /imagefs/usr/local/bin \
-         && for dir in "$MAKEDIRS"; \
+         && for dir in $MAKEDIRS; \
             do \
                mkdir -p "$dir" "/imagefs$dir"; \
             done \
@@ -37,7 +37,7 @@ ONBUILD RUN mkdir -p /buildfs /imagefs/usr/local/bin \
          && [ -d "/tmp/rootfs" ] && cp -a /tmp/rootfs/* /imagefs/ || /bin/true \
          && rm -rf /tmp/* /imagefs/tmp/* /imagefs/lib/apk /imagefs/etc/apk /buildfs $REMOVEFILES \
          && chmod +x /usr/sbin/relpath \
-         && for exe in "$EXECUTABLES"; \
+         && for exe in $EXECUTABLES; \
             do \
                exeDir="$(dirname "$exe")"; \
                if [ "$exeDir" != "/usr/local/bin" ]; \
