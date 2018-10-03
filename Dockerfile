@@ -34,6 +34,15 @@ ONBUILD RUN mkdir -p /buildfs /imagefs/usr/local/bin $MAKEDIRS \
          && eval "$RUNCMDS" \
          && [ -d "/tmp/rootfs" ] && cp -a /tmp/rootfs/* /imagefs/ || /bin/true \
          && rm -rf /tmp/* /imagefs/tmp/* /imagefs/lib/apk /imagefs/etc/apk /buildfs $REMOVEFILES \
-         && for exe in "$EXECUTABLES"; do cp -a $exe /imagefs/usr/local/bin/; cd "$(dirname $exe)"; ln -sf  \
-         && ln -sf 
+         && for exe in "$EXECUTABLES"; \
+            do \
+               exeDir="$(dirname "$exe")"; \
+               if [ "$exeDir" != "/usr/local/bin" ]; \
+               then \
+                  exeName="$(basename "$exe")"; \
+                  cp -a "$exe" "/imagefs/usr/local/bin/"; \
+                  cd "/imagefs$exeDir"; \
+                  ln -sf "$(relpath "/imagefs$exe" "/imagefs/usr/local/bin/$exeName")" "$exeName"; \
+               fi; \
+            done
          
