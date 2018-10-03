@@ -36,7 +36,6 @@ ONBUILD RUN set -e \
          && apk --no-cache --root /buildfs --allow-untrusted --virtual .builddeps_untrusted add $BUILDDEPS_UNTRUSTED \
          && eval "$RUNCMDS" \
          && [ -d "/tmp/rootfs" ] && cp -a /tmp/rootfs/* /imagefs/ || /bin/true \
-         && rm -rf /tmp/* /imagefs/tmp/* /imagefs/lib/apk /imagefs/etc/apk /buildfs $REMOVEFILES \
          && chmod +x /usr/sbin/relpath \
          && for exe in $EXECUTABLES; \
             do \
@@ -52,5 +51,6 @@ ONBUILD RUN set -e \
             done \
          && chmod o= /imagefs/usr/local/bin/* /tmp \
          && chmod go= /imagefs/bin /imagefs/sbin /imagefs/usr/bin /imagefs/usr/sbin \
-         && rm -rf /imagefs/sys /imagefs/dev /imagefs/proc
+         && set +e \
+         && rm -rf $REMOVEFILES /imagefs/sys /imagefs/dev /imagefs/proc /tmp/* /imagefs/tmp/* /imagefs/lib/apk /imagefs/etc/apk /imagefs/var/cache/apk/* /buildfs
          
