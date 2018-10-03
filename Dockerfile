@@ -24,8 +24,7 @@ ONBUILD RUN set -e \
             done \
          && tar -xvp -f /apk-tool.tar -C / \
          && tar -xvp -f /apk-tool.tar -C /buildfs/ \
-         && cat /apk-tool.filelist | xargs rm -rf \
-         && rm -f /apk-tool.tar /apk-tool.filelist \
+         && rm -f /apk-tool.tar \
          && echo $ADDREPOS >> /buildfs/etc/apk/repositories \
          && apk --no-cache --root /buildfs add --initdb \
          && apk --no-cache --root /buildfs --virtual .rundeps add $RUNDEPS \
@@ -52,6 +51,7 @@ ONBUILD RUN set -e \
             done \
          && chmod o= /imagefs/usr/local/bin/* /tmp \
          && chmod go= /imagefs/bin /imagefs/sbin /imagefs/usr/bin /imagefs/usr/sbin \
+         && cat /apk-tool.filelist | awk '{print "/imagefs"$1}' | xargs rm -rf \
          && set +e \
          && rm -rf $REMOVEFILES /imagefs/sys /imagefs/dev /imagefs/proc /tmp/* /imagefs/tmp/* /imagefs/lib/apk /imagefs/etc/apk /imagefs/var/cache/apk/* /buildfs
          
