@@ -7,13 +7,14 @@ ONBUILD ARG RUNDEPS
 ONBUILD ARG RUNDEPS_UNTRUSTED
 ONBUILD ARG MAKEDIRS
 ONBUILD ARG REMOVEFILES
+ONBUILD ARG EXECUTABLES
 ONBUILD ARG BUILDCMDS
 
 ONBUILD COPY --from=init / /
 ONBUILD COPY --from=init / /imagefs/
 ONBUILD COPY ./* /tmp/
 
-ONBUILD RUN mkdir -p /buildfs $MAKEDIRS \
+ONBUILD RUN mkdir -p /buildfs /imagefs/usr/local/bin $MAKEDIRS \
          && tar -xvp -f /apk-tool.tar -C / \
          && tar -xvp -f /apk-tool.tar -C /buildfs/ \
          && rm -rf /apk-tool.tar \
@@ -28,4 +29,7 @@ ONBUILD RUN mkdir -p /buildfs $MAKEDIRS \
          && apk --no-cache --root /buildfs --allow-untrusted --virtual .builddeps_untrusted add $BUILDDEPS_UNTRUSTED \
          && eval "$RUNCMDS" \
          && [ -d "/tmp/rootfs" ] && cp -a /tmp/rootfs/* /imagefs/ || /bin/true \
-         && rm -rf /tmp/* /imagefs/tmp/* /imagefs/lib/apk /imagefs/etc/apk /buildfs $REMOVEFILES
+         && rm -rf /tmp/* /imagefs/tmp/* /imagefs/lib/apk /imagefs/etc/apk /buildfs $REMOVEFILES \
+         && for exe in "$EXECUTABLES"; do cp -a $exe /imagefs/usr/local/bin/; cd "$(dirname $exe)"; ln -sf  \
+         && ln -sf 
+         
