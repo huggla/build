@@ -35,11 +35,20 @@ ONBUILD RUN mkdir -p /buildfs \
          && apk --no-cache --root /buildfs --virtual .rundeps add $RUNDEPS \
          && apk --no-cache --root /buildfs --allow-untrusted --virtual .rundeps_untrusted add $RUNDEPS_UNTRUSTED \
          && cp -a /buildfs/* /imagefs/ \
-         && [ -d "/tmp/rootfs" ] && cp -a /tmp/rootfs/* /buildfs/ || /bin/true \
-         && [ -d "/tmp/buildfs" ] && cp -a /tmp/buildfs/* /buildfs/ || /bin/true \
+         && cp -a /tmp/rootfs/* /buildfs/ || /bin/true \
+         && cp -a /tmp/buildfs/* /buildfs/ || /bin/true \
          && apk --no-cache --root /buildfs --virtual .builddeps add $BUILDDEPS \
          && apk --no-cache --root /buildfs --allow-untrusted --virtual .builddeps_untrusted add $BUILDDEPS_UNTRUSTED \
-         && [ -d "/tmp/rootfs" ] && cp -a /tmp/rootfs/* /imagefs/ || /bin/true \
+         && if [ -n "$DOWNLOADS" ]; \
+            then \
+               downloadDir="$(mktemp -d)"; \
+               cd $downloadDir; \
+               for download in $DOWNLOADS; \
+               do \
+                  wget "$download"; \
+               done \
+            fi \
+         && cp -a /tmp/rootfs/* /imagefs/ || /bin/true \
          && eval "$BUILDCMDS" \
          && chmod +x /usr/sbin/relpath \
          && for exe in $EXECUTABLES; \
@@ -52,7 +61,7 @@ ONBUILD RUN mkdir -p /buildfs \
                   cp -a "$exe" "/imagefs/usr/local/bin/"; \
                   cd "$exeDir"; \
                   ln -sf "$(relpath "$exeDir" "/imagefs/usr/local/bin")/$exeName" "$exeName"; \
-               fi; \
+               fi \
             done \
          && chmod o= /imagefs/usr/local/bin/* /tmp \
          && chmod go= /imagefs/bin /imagefs/sbin /imagefs/usr/bin /imagefs/usr/sbin \
@@ -61,6 +70,6 @@ ONBUILD RUN mkdir -p /buildfs \
                if [ ! -e "/imagefs$file" ]; \
                then \
                   rm -rf "/imagefs$file"; \
-               fi; \
+               fi \
             done < /apk-tool.filelist \
          && rm -rf $REMOVEFILES /imagefs/sys /imagefs/dev /imagefs/proc /tmp/* /imagefs/tmp/* /imagefs/lib/apk /imagefs/etc/apk /imagefs/var/cache/apk/* /buildfs
