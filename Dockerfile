@@ -16,8 +16,7 @@ ONBUILD COPY --from=init / /
 ONBUILD COPY --from=init / /imagefs/
 ONBUILD COPY ./ /tmp/
 
-ONBUILD RUN set -e \
-         && mkdir -p /buildfs \
+ONBUILD RUN mkdir -p /buildfs \
          && for dir in $MAKEDIRS; \
             do \
                mkdir -p "$dir" "/imagefs$dir"; \
@@ -38,7 +37,7 @@ ONBUILD RUN set -e \
          && [ -d "/tmp/buildfs" ] && cp -a /tmp/buildfs/* /buildfs/ || /bin/true \
          && apk --no-cache --root /buildfs --virtual .builddeps add $BUILDDEPS \
          && apk --no-cache --root /buildfs --allow-untrusted --virtual .builddeps_untrusted add $BUILDDEPS_UNTRUSTED \
-         && eval "set -e && $BUILDCMDS" \
+         && eval "$BUILDCMDS" \
          && [ -d "/tmp/rootfs" ] && cp -a /tmp/rootfs/* /imagefs/ || /bin/true \
          && chmod +x /usr/sbin/relpath \
          && for exe in $EXECUTABLES; \
