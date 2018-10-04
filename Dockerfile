@@ -37,7 +37,7 @@ ONBUILD RUN mkdir -p /buildfs \
          && [ -d "/tmp/buildfs" ] && cp -a /tmp/buildfs/* /buildfs/ || /bin/true \
          && apk --no-cache --root /buildfs --virtual .builddeps add $BUILDDEPS \
          && apk --no-cache --root /buildfs --allow-untrusted --virtual .builddeps_untrusted add $BUILDDEPS_UNTRUSTED \
-         && eval "$BUILDCMDS" \
+         && eval "set -e && $BUILDCMDS" \
          && [ -d "/tmp/rootfs" ] && cp -a /tmp/rootfs/* /imagefs/ || /bin/true \
          && chmod +x /usr/sbin/relpath \
          && for exe in $EXECUTABLES; \
