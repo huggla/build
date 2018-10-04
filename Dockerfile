@@ -2,6 +2,9 @@ FROM huggla/apk-tool as image
 
 COPY ./rootfs /
 
+RUN chmod +x /usr/sbin/relpath \
+ && mkdir -p /buildfs
+
 ONBUILD ARG IMAGE
 ONBUILD ARG DOWNLOADS
 ONBUILD ARG ADDREPOS
@@ -18,8 +21,7 @@ ONBUILD COPY --from=init / /
 ONBUILD COPY --from=init / /imagefs/
 ONBUILD COPY ./ /tmp/
 
-ONBUILD RUN mkdir -p /buildfs \
-         && for dir in $MAKEDIRS; \
+ONBUILD RUN for dir in $MAKEDIRS; \
             do \
                mkdir -p "$dir" "/imagefs$dir"; \
             done \
@@ -49,8 +51,12 @@ ONBUILD RUN mkdir -p /buildfs \
                done \
             fi \
          && cp -a /tmp/rootfs/* /imagefs/ || /bin/true \
-         && eval "$BUILDCMDS" \
-         && chmod +x /usr/sbin/relpath \
+         && if [ -n "$BUILDCMDS" ]; \
+            then \
+               buildDir="$(mktemp -d -p /buildfs/tmp)"; \
+               cd $buildDir; \
+               eval "$BUILDCMDS"; \
+            fi \
          && for exe in $EXECUTABLES; \
             do \
                exe="/imagefs$exe"; \
