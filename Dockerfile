@@ -41,7 +41,7 @@ ONBUILD RUN mkdir -p /buildfs \
          && apk --no-cache --root /buildfs --allow-untrusted --virtual .builddeps_untrusted add $BUILDDEPS_UNTRUSTED \
          && if [ -n "$DOWNLOADS" ]; \
             then \
-               downloadDir="$(mktemp -d)"; \
+               downloadDir="$(mktemp -d -p /buildfs/tmp)"; \
                cd $downloadDir; \
                for download in $DOWNLOADS; \
                do \
