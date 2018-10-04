@@ -41,6 +41,7 @@ ONBUILD RUN for dir in $MAKEDIRS; \
          && cp -a /tmp/buildfs/* /buildfs/ || /bin/true \
          && apk --no-cache --root /buildfs --virtual .builddeps add $BUILDDEPS \
          && apk --no-cache --root /buildfs --allow-untrusted --virtual .builddeps_untrusted add $BUILDDEPS_UNTRUSTED \
+         && buildDir="$(mktemp -d -p /buildfs/tmp)" \
          && if [ -n "$DOWNLOADS" ]; \
             then \
                downloadDir="$(mktemp -d -p /buildfs/tmp)"; \
@@ -49,11 +50,11 @@ ONBUILD RUN for dir in $MAKEDIRS; \
                do \
                   wget "$download"; \
                done \
+               tar -xvp -f $downloadDir/* -C $buildDir || /bin/true; \
             fi \
          && cp -a /tmp/rootfs/* /imagefs/ || /bin/true \
          && if [ -n "$BUILDCMDS" ]; \
             then \
-               buildDir="$(mktemp -d -p /buildfs/tmp)"; \
                cd $buildDir; \
                eval "$BUILDCMDS"; \
             fi \
