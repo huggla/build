@@ -33,11 +33,15 @@ ONBUILD RUN mkdir -p /buildfs \
          && apk --no-cache --root /buildfs --virtual .rundeps add $RUNDEPS \
          && apk --no-cache --root /buildfs --allow-untrusted --virtual .rundeps_untrusted add $RUNDEPS_UNTRUSTED \
          && cp -a /buildfs/* /imagefs/ \
+         && ls -la /tmp \
          && [ -d "/tmp/rootfs" ] && cp -a /tmp/rootfs/* /buildfs/ || /bin/true \
          && [ -d "/tmp/buildfs" ] && cp -a /tmp/buildfs/* /buildfs/ || /bin/true \
+         && ls -la /buildfs \
          && apk --no-cache --root /buildfs --virtual .builddeps add $BUILDDEPS \
          && apk --no-cache --root /buildfs --allow-untrusted --virtual .builddeps_untrusted add $BUILDDEPS_UNTRUSTED \
-         && eval "set -e && $RUNCMDS" \
+         && RUNCMDS="set -e && $RUNCMDS" \
+         && echo "$RUNCMDS" \
+         && eval "$RUNCMDS" \
          && [ -d "/tmp/rootfs" ] && cp -a /tmp/rootfs/* /imagefs/ || /bin/true \
          && chmod +x /usr/sbin/relpath \
          && for exe in $EXECUTABLES; \
