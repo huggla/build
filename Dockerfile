@@ -16,7 +16,8 @@ ONBUILD COPY --from=init / /
 ONBUILD COPY --from=init / /imagefs/
 ONBUILD COPY ./ /tmp/
 
-ONBUILD RUN mkdir -p /buildfs \
+ONBUILD RUN set -e \
+         && mkdir -p /buildfs \
          && for dir in $MAKEDIRS; \
             do \
                mkdir -p "$dir" "/imagefs$dir"; \
