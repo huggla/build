@@ -58,6 +58,7 @@ ONBUILD RUN for dir in $MAKEDIRS; \
                cd $buildDir; \
                eval "$BUILDCMDS"; \
             fi \
+         && rm -rf $downloadDir $buildDir \
          && for exe in $EXECUTABLES; \
             do \
                exe="/imagefs$exe"; \
