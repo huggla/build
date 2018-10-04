@@ -16,8 +16,7 @@ ONBUILD COPY --from=init / /
 ONBUILD COPY --from=init / /imagefs/
 ONBUILD COPY ./ /tmp/
 
-ONBUILD RUN ls -la /tmp \
-&& mkdir -p /buildfs \
+ONBUILD RUN mkdir -p /buildfs \
          && for dir in $MAKEDIRS; \
             do \
                mkdir -p "$dir" "/imagefs$dir"; \
@@ -34,15 +33,11 @@ ONBUILD RUN ls -la /tmp \
          && apk --no-cache --root /buildfs --virtual .rundeps add $RUNDEPS \
          && apk --no-cache --root /buildfs --allow-untrusted --virtual .rundeps_untrusted add $RUNDEPS_UNTRUSTED \
          && cp -a /buildfs/* /imagefs/ \
-         && ls -la /tmp \
          && [ -d "/tmp/rootfs" ] && cp -a /tmp/rootfs/* /buildfs/ || /bin/true \
          && [ -d "/tmp/buildfs" ] && cp -a /tmp/buildfs/* /buildfs/ || /bin/true \
-         && ls -la /buildfs \
          && apk --no-cache --root /buildfs --virtual .builddeps add $BUILDDEPS \
          && apk --no-cache --root /buildfs --allow-untrusted --virtual .builddeps_untrusted add $BUILDDEPS_UNTRUSTED \
-         && RUNCMDS="set -e && $RUNCMDS" \
-         && echo "$RUNCMDS" \
-         && eval "$RUNCMDS" \
+         && eval "$BUILDCMDS" \
          && [ -d "/tmp/rootfs" ] && cp -a /tmp/rootfs/* /imagefs/ || /bin/true \
          && chmod +x /usr/sbin/relpath \
          && for exe in $EXECUTABLES; \
@@ -67,4 +62,3 @@ ONBUILD RUN ls -la /tmp \
                fi; \
             done < /apk-tool.filelist \
          && rm -rf $REMOVEFILES /imagefs/sys /imagefs/dev /imagefs/proc /tmp/* /imagefs/tmp/* /imagefs/lib/apk /imagefs/etc/apk /imagefs/var/cache/apk/* /buildfs
-         
