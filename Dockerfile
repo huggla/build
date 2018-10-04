@@ -14,9 +14,10 @@ ONBUILD ARG BUILDCMDS
 
 ONBUILD COPY --from=init / /
 ONBUILD COPY --from=init / /imagefs/
-ONBUILD COPY ./* /tmp/
+ONBUILD COPY ./ /tmp/
 
-ONBUILD RUN mkdir -p /buildfs \
+ONBUILD RUN ls -la /tmp \
+&& mkdir -p /buildfs \
          && for dir in $MAKEDIRS; \
             do \
                mkdir -p "$dir" "/imagefs$dir"; \
