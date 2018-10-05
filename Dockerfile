@@ -55,7 +55,7 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
          && if [ -n "$BUILDCMDS" ]; \
             then \
                cd $buildDir; \
-               eval "$BUILDCMDS"; \
+               eval "$BUILDCMDS || exit 1"; \
             fi \
          && rm -rf $downloadDir $buildDir \
          && for exe in $EXECUTABLES; \
