@@ -50,13 +50,13 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
                   wget "$download"; \
                done \
                tar -xvp -f $downloadDir/* -C $buildDir || /bin/true; \
-            fi \
+            fi; \
          && cp -a /tmp/rootfs/* /imagefs/ || /bin/true \
          && if [ -n "$BUILDCMDS" ]; \
             then \
                cd $buildDir; \
                eval "$BUILDCMDS"; \
-            fi \
+            fi; \
          && rm -rf $downloadDir $buildDir \
          && for exe in $EXECUTABLES; \
             do \
@@ -68,7 +68,7 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
                   cp -a "$exe" "/imagefs/usr/local/bin/"; \
                   cd "$exeDir"; \
                   ln -sf "$(relpath "$exeDir" "/imagefs/usr/local/bin")/$exeName" "$exeName"; \
-               fi \
+               fi; \
             done \
          && chmod o= /imagefs/usr/local/bin/* /tmp \
          && chmod go= /imagefs/bin /imagefs/sbin /imagefs/usr/bin /imagefs/usr/sbin \
@@ -77,6 +77,6 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
                if [ ! -e "/imagefs$file" ]; \
                then \
                   rm -rf "/imagefs$file"; \
-               fi \
+               fi; \
             done < /apk-tool.filelist \
          && rm -rf $REMOVEFILES /imagefs/sys /imagefs/dev /imagefs/proc /tmp/* /imagefs/tmp/* /imagefs/lib/apk /imagefs/etc/apk /imagefs/var/cache/apk/* /buildfs
