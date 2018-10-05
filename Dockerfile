@@ -23,14 +23,14 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
          && for dir in $MAKEDIRS; \
             do \
                mkdir -p "$dir" "/imagefs$dir"; \
-            done; \
+            done \
          && tar -xvp -f /apk-tool.tar -C / \
          && rm -f /apk-tool.tar \
          && while read file; \
             do \
                mkdir -p "/buildfs$(dirname $file)"; \
                ln -sf "$file" "/buildfs$file"; \
-            done < /apk-tool.filelist; \
+            done < /apk-tool.filelist \
          && echo $ADDREPOS >> /buildfs/etc/apk/repositories \
          && apk --no-cache --root /buildfs add --initdb \
          && apk --no-cache --root /buildfs --virtual .rundeps add $RUNDEPS \
@@ -50,13 +50,13 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
                   wget "$download"; \
                done; \
                tar -xvp -f $downloadDir/* -C $buildDir || /bin/true; \
-            fi; \
+            fi \
          && cp -a /tmp/rootfs/* /imagefs/ || /bin/true \
          && if [ -n "$BUILDCMDS" ]; \
             then \
                cd $buildDir; \
                eval "$BUILDCMDS"; \
-            fi; \
+            fi \
          && rm -rf $downloadDir $buildDir \
          && for exe in $EXECUTABLES; \
             do \
@@ -69,7 +69,7 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
                   cd "$exeDir"; \
                   ln -sf "$(relpath "$exeDir" "/imagefs/usr/local/bin")/$exeName" "$exeName"; \
                fi; \
-            done; \
+            done \
          && chmod o= /imagefs/usr/local/bin/* /tmp \
          && chmod go= /imagefs/bin /imagefs/sbin /imagefs/usr/bin /imagefs/usr/sbin \
          && while read file; \
@@ -78,5 +78,5 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
                then \
                   rm -rf "/imagefs$file"; \
                fi; \
-            done < /apk-tool.filelist; \
-&& rm -rf $REMOVEFILES /imagefs/sys /imagefs/dev /imagefs/proc /tmp/* /imagefs/tmp/* /imagefs/lib/apk /imagefs/etc/apk /imagefs/var/cache/apk/* /buildfs
+            done < /apk-tool.filelist \
+         && rm -rf $REMOVEFILES /imagefs/sys /imagefs/dev /imagefs/proc /tmp/* /imagefs/tmp/* /imagefs/lib/apk /imagefs/etc/apk /imagefs/var/cache/apk/* /buildfs
