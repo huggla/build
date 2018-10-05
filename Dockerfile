@@ -2,9 +2,6 @@ FROM huggla/apk-tool:20181005-edge as image
 
 COPY ./rootfs /
 
-RUN chmod +x /usr/sbin/relpath \
- && mkdir -p /buildfs
-
 ONBUILD ARG IMAGE
 ONBUILD ARG DOWNLOADS
 ONBUILD ARG ADDREPOS
@@ -21,7 +18,9 @@ ONBUILD COPY --from=init / /
 ONBUILD COPY --from=init / /imagefs/
 ONBUILD COPY ./ /tmp/
 
-ONBUILD RUN for dir in $MAKEDIRS; \
+ONBUILD RUN chmod +x /usr/sbin/relpath \
+         && mkdir -p /buildfs \
+         && for dir in $MAKEDIRS; \
             do \
                mkdir -p "$dir" "/imagefs$dir"; \
             done \
