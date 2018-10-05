@@ -1,4 +1,4 @@
-FROM huggla/apk-tool as image
+FROM huggla/apk-tool:20181005-edge as image
 
 COPY ./rootfs /
 
