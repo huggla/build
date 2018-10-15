@@ -38,11 +38,12 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
          && cp -a /buildfs/* /imagefs/ \
          && cp -a /tmp/rootfs/* /buildfs/ || /bin/true \
          && cp -a /tmp/buildfs/* /buildfs/ || /bin/true \
-         && apk --no-cache --root /buildfs --virtual .builddeps add ssl_client $BUILDDEPS \
-         && apk --no-cache --root /buildfs --allow-untrusted --virtual .builddeps_untrusted add $BUILDDEPS_UNTRUSTED \
+         && apk --no-cache --virtual .builddeps add $BUILDDEPS \
+         && apk --no-cache --allow-untrusted --virtual .builddeps_untrusted add $BUILDDEPS_UNTRUSTED \
          && buildDir="$(mktemp -d -p /buildfs/tmp)" \
          && if [ -n "$DOWNLOADS" ]; \
             then \
+               apk --no-cache --virtual .downloaddeps add ssl_client; \
                downloadDir="$(mktemp -d -p /buildfs/tmp)"; \
                cd $downloadDir; \
                for download in $DOWNLOADS; \
@@ -50,6 +51,8 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
                   wget "$download"; \
                done; \
                tar -xvp -f $downloadDir/* -C $buildDir || /bin/true; \
+               apk --no-cache --purge del .downloaddeps; \
+               rm -rf $downloadDir; \
             fi \
          && cp -a /tmp/rootfs/* /imagefs/ || /bin/true \
          && if [ -n "$BUILDCMDS" ]; \
@@ -57,7 +60,8 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
                cd $buildDir; \
                eval "$BUILDCMDS || exit 1"; \
             fi \
-         && rm -rf $downloadDir $buildDir \
+         && apk --no-cache --purge del .builddeps .builddeps_untrusted \
+         && rm -rf $buildDir \
          && for exe in $EXECUTABLES; \
             do \
                exe="/imagefs$exe"; \
