@@ -62,8 +62,6 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
                cd $buildDir; \
                eval "$BUILDCMDS || exit 1"; \
             fi \
-         && apk --no-cache --purge del .builddeps .builddeps_untrusted \
-&& echo hej \
          && rm -rf /buildfs \
          && for exe in $EXECUTABLES; \
             do \
@@ -82,9 +80,8 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
             do \
                if [ ! -e "/imagefs$file" ]; \
                then \
-echo "/imagefs$file"; \
                   rm -rf "/imagefs$file"; \
                fi; \
             done < /apk-tool.filelist \
-&& echo hej2 \
-         && rm -rf $REMOVEFILES /imagefs/sys /imagefs/dev /imagefs/proc /tmp/* /imagefs/tmp/* /imagefs/lib/apk /imagefs/etc/apk /imagefs/var/cache/apk/*
+         && rm -rf $REMOVEFILES /imagefs/sys /imagefs/dev /imagefs/proc /tmp/* /imagefs/tmp/* /imagefs/lib/apk /imagefs/etc/apk /imagefs/var/cache/apk/* \
+         && apk --no-cache --purge del .builddeps .builddeps_untrusted
