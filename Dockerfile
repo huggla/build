@@ -26,7 +26,7 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
             done \
          && tar -xvp -f /apk-tool.tar -C / \
          && tar -xvp -f /apk-tool.tar -C /imagefs \
-         && rm -f /apk-tool.tar \
+         && rm -f /apk-tool.* \
          && echo $ADDREPOS >> /etc/apk/repositories \
          && echo $ADDREPOS >> /imagefs/etc/apk/repositories \
          && apk --no-cache add --initdb \
