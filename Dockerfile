@@ -50,13 +50,13 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
                   wget "$download"; \
                done; \
                tar -xvp -f $downloadDir/* -C $buildDir || /bin/true; \
-            fi; \
+            fi \
          && cp -a /tmp/rootfs/* /imagefs/ || /bin/true \
          && if [ -n "$BUILDCMDS" ]; \
             then \
                cd $buildDir; \
                eval "$BUILDCMDS || exit 1"; \
-            fi; \
+            fi \
          && rm -rf $downloadDir $buildDir \
          && for exe in $EXECUTABLES; \
             do \
