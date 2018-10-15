@@ -48,7 +48,7 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
                for download in $DOWNLOADS; \
                do \
                   wget "$download"; \
-               done \
+               done; \
                tar -xvp -f $downloadDir/* -C $buildDir || /bin/true; \
             fi; \
          && cp -a /tmp/rootfs/* /imagefs/ || /bin/true \
