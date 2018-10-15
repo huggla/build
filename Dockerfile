@@ -86,5 +86,5 @@ echo "/imagefs$file"; \
                   rm -rf "/imagefs$file"; \
                fi; \
             done < /apk-tool.filelist \
-echo hej2 \
+&& echo hej2 \
          && rm -rf $REMOVEFILES /imagefs/sys /imagefs/dev /imagefs/proc /tmp/* /imagefs/tmp/* /imagefs/lib/apk /imagefs/etc/apk /imagefs/var/cache/apk/*
