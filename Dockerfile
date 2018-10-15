@@ -25,14 +25,19 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
                mkdir -p "$dir" "/imagefs$dir"; \
             done \
          && tar -xvp -f /apk-tool.tar -C / \
-         && tar -xvp -f /apk-tool.tar -C /imagefs \
-         && rm -f /apk-tool.* \
+         && rm -f /apk-tool.tar \
+         && while read file; \
+            do \
+               mkdir -p "/buildfs$(dirname $file)"; \
+               ln -sf "$file" "/buildfs$file"; \
+            done < /apk-tool.filelist \
+         && echo $ADDREPOS >> /buildfs/etc/apk/repositories \
+         && apk --no-cache --root /buildfs add --initdb \
+         && apk --no-cache --root /buildfs --virtual .rundeps add $RUNDEPS \
+         && apk --no-cache --root /buildfs --allow-untrusted --virtual .rundeps_untrusted add $RUNDEPS_UNTRUSTED \
+         && cp -a /buildfs/* /imagefs/ \
          && echo $ADDREPOS >> /etc/apk/repositories \
-         && echo $ADDREPOS >> /imagefs/etc/apk/repositories \
          && apk --no-cache add --initdb \
-         && apk --no-cache --root /imagefs add --initdb \
-         && apk --no-cache --root /imagefs --virtual .rundeps add $RUNDEPS \
-         && apk --no-cache --root /imagefs --allow-untrusted --virtual .rundeps_untrusted add $RUNDEPS_UNTRUSTED \
          && cp -a /tmp/rootfs/* /buildfs/ || /bin/true \
          && cp -a /tmp/buildfs/* /buildfs/ || /bin/true \
          && apk --no-cache --virtual .builddeps add $BUILDDEPS \
@@ -72,4 +77,11 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
                fi; \
             done \
          && chmod o= /imagefs/usr/local/bin/* /tmp /imagefs/bin /imagefs/sbin /imagefs/usr/bin /imagefs/usr/sbin \
+         && while read file; \
+            do \
+               if [ ! -e "/imagefs$file" ]; \
+               then \
+                  rm -rf "/imagefs$file"; \
+               fi; \
+            done < /apk-tool.filelist \
          && rm -rf $REMOVEFILES /imagefs/sys /imagefs/dev /imagefs/proc /tmp/* /imagefs/tmp/* /imagefs/lib/apk /imagefs/etc/apk /imagefs/var/cache/apk/*
