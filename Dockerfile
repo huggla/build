@@ -38,7 +38,7 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
          && cp -a /buildfs/* /imagefs/ \
          && cp -a /tmp/rootfs/* /buildfs/ || /bin/true \
          && cp -a /tmp/buildfs/* /buildfs/ || /bin/true \
-         && apk --no-cache --root /buildfs --virtual .builddeps add $BUILDDEPS \
+         && apk --no-cache --root /buildfs --virtual .builddeps add ssl_client $BUILDDEPS \
          && apk --no-cache --root /buildfs --allow-untrusted --virtual .builddeps_untrusted add $BUILDDEPS_UNTRUSTED \
          && buildDir="$(mktemp -d -p /buildfs/tmp)" \
          && if [ -n "$DOWNLOADS" ]; \
