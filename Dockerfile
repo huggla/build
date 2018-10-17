@@ -35,7 +35,7 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
          && apk --no-cache --root /buildfs add --initdb \
          && apk --no-cache --root /buildfs --virtual .rundeps add $RUNDEPS \
          && apk --no-cache --root /buildfs --allow-untrusted --virtual .rundeps_untrusted add $RUNDEPS_UNTRUSTED \
-         && cp -a /buildfs/* /imagefs/ \
+         && cp -a /buildfs/* /imagefs/ || /bin/true \
          && echo $ADDREPOS >> /etc/apk/repositories \
          && apk --no-cache add --initdb \
          && cp -a /tmp/rootfs/* /buildfs/ || /bin/true \
