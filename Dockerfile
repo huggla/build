@@ -35,7 +35,9 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
          && apk --no-cache --root /buildfs add --initdb \
          && apk --no-cache --root /buildfs --virtual .rundeps add $RUNDEPS \
          && apk --no-cache --root /buildfs --allow-untrusted --virtual .rundeps_untrusted add $RUNDEPS_UNTRUSTED \
-         && cp -a /buildfs/* /imagefs/ || /bin/true \
+         && cd /buildfs \
+         && find . ! -type d -exec ls -la {} + | awk -F " " '{print $5" "$9}' > /installed_files.list.tmp \
+         && diff -dTNU 0 /installed_files.list /installed_files.list.tmp | grep $'^[+]\t' | awk -F " ." '{print "."$2 >> "/imagefs/installed_files.list"; system("cp -a ."$2" /imagefs/")}' \
          && echo $ADDREPOS >> /etc/apk/repositories \
          && apk --no-cache add --initdb \
          && cp -a /tmp/rootfs/* /buildfs/ || /bin/true \
