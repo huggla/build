@@ -41,9 +41,13 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
          && find * -type d -exec mkdir -p /imagefs/{} + \
       && echo hej2 \
       && find * ! -type d ! -type c -exec ls -la {} + \
-         && find * ! -type d ! -type c -exec ls -la {} + | awk -F " " '{print $5" "$9}' > /installed_files.list.tmp \
-      && cat /installed_files.list.tmp \
-         && diff -dTNU 0 /installed_files.list /installed_files.list.tmp | grep $'^[+]\t' | awk -F " ." '{print "."$2 >> "/imagefs/installed_files.list"; system("cp -a ."$2" /imagefs/")}' \
+         && find * ! -type d ! -type c -exec ls -la {} + | awk -F " " '{print $5" "$9}' > /installed_files.list.tmp1 \
+      && cat /installed_files.list.tmp1 \
+      && cat /apk-tool.filelist \
+         && diff -dTNU 0 /apk-tool.filelist /installed_files.list.tmp1 | grep $'^[+]\t' | awk -F " ." '{print "."$2 >> "/imagefs/installed_files.list.tmp2"}' \
+      && echo hej3 \
+      && cat /installed_files.list.tmp2 \
+         && diff -dTNU 0 /installed_files.list /installed_files.list.tmp2 | grep $'^[+]\t' | awk -F " ." '{print "."$2 >> "/imagefs/installed_files.list"; system("cp -a ."$2" /imagefs/")}' \
          && echo $ADDREPOS >> /etc/apk/repositories \
          && apk --no-cache add --initdb \
          && cp -a /tmp/rootfs/* /buildfs/ || /bin/true \
