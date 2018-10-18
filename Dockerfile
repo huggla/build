@@ -39,13 +39,16 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
       && echo hej \
          && find * -type d -exec mkdir -p /imagefs/{} + \
       && find * ! -type d ! -type c -exec ls -la {} + \
-         && find * ! -type d ! -type c -exec ls -la {} + | awk -F " " '{print $5" "$9}' > /imagefs/exclude.filelist \
-      && cat /exclude.filelist \
+         && find * ! -type d ! -type c -exec ls -la {} + | awk -F " " '{print $5" "$9}' > /imagefs/onbuild-exclude.filelist \
+      && cat /onbuild-exclude.filelist \
       && echo hej2 \
-      && cat /imagefs/exclude.filelist \
+      && cat /imagefs/onbuild-exclude.filelist \
       && echo hej3 \
-      && diff -dTNU 0 /exclude.filelist /imagefs/exclude.filelist | grep $'^[+]\t' \
-         && diff -dTNU 0 /exclude.filelist /imagefs/exclude.filelist | grep $'^[+]\t' | awk -F " ." '{system("cp -a ."$2" /imagefs/")}' \
+      && diff -dTNU 0 /onbuild-exclude.filelist /imagefs/onbuild-exclude.filelist \
+      && echo hej4 \
+      && diff -dTNU 0 /onbuild-exclude.filelist /imagefs/onbuild-exclude.filelist | grep $'^[+]\t' \
+      && echo hej5 \
+         && diff -dTNU 0 /onbuild-exclude.filelist /imagefs/onbuild-exclude.filelist | grep $'^[+]\t' | awk -F " ." '{system("cp -a ."$2" /imagefs/")}' \
          && echo $ADDREPOS >> /etc/apk/repositories \
          && apk --no-cache add --initdb \
          && cp -a /tmp/rootfs/* /buildfs/ || /bin/true \
