@@ -39,9 +39,9 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
       && ls -la /imagefs \
       && echo hej \
          && find * -type d -exec mkdir -p /imagefs/{} + \
-      && ls -la /imagefs \
-      && find * ! -type d -exec ls -la {} + \
-         && find * ! -type d -exec ls -la {} + | awk -F " " '{print $5" "$9}' > /installed_files.list.tmp \
+      && echo hej2 \
+      && find * ! -type d ! -type c -exec ls -la {} + \
+         && find * ! -type d ! -type c -exec ls -la {} + | awk -F " " '{print $5" "$9}' > /installed_files.list.tmp \
       && cat /installed_files.list.tmp \
          && diff -dTNU 0 /installed_files.list /installed_files.list.tmp | grep $'^[+]\t' | awk -F " ." '{print "."$2 >> "/imagefs/installed_files.list"; system("cp -a ."$2" /imagefs/")}' \
          && echo $ADDREPOS >> /etc/apk/repositories \
