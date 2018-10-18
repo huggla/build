@@ -39,5 +39,5 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
          && find * -type d -exec mkdir -p /imagefs/{} + \
          && find * ! -type d ! -type c -exec ls -la {} + | awk -F " " '{print $5" "$9 > "/imagefs/onbuild-exclude.filelist"}' \
          && echo "hej3" \
-         && diff -abBdNT -U 0 /onbuild-exclude.filelist /imagefs/onbuild-exclude.filelist || echo "hej$?" \
+         && comm -13 <(sort /onbuild-exclude.filelist) <(sort /imagefs/onbuild-exclude.filelist) \
          && echo "hej4"
