@@ -36,13 +36,8 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
          && apk --no-cache --root /buildfs --virtual .rundeps add $RUNDEPS \
          && apk --no-cache --root /buildfs --allow-untrusted --virtual .rundeps_untrusted add $RUNDEPS_UNTRUSTED \
          && cd /buildfs \
-      && echo hej \
          && find * -type d -exec mkdir -p /imagefs/{} + \
-      && find * ! -type d ! -type c -exec ls -la {} + \
          && find * ! -type d ! -type c -exec ls -la {} + | awk -F " " '{print $5" "$9}' > /imagefs/onbuild-exclude.filelist \
-      && cat /onbuild-exclude.filelist \
-      && echo hej2 \
-      && cat /imagefs/onbuild-exclude.filelist \
-      && echo hej3 \
-      && diff -abBdNT -U 0 /onbuild-exclude.filelist /imagefs/onbuild-exclude.filelist \
-      && echo hej4
+      && echo "hej3" \
+      && diff -abBdNT -U 0 /onbuild-exclude.filelist /imagefs/onbuild-exclude.filelist > /imagefs/apa \
+      && echo "hej4"
