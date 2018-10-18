@@ -36,22 +36,16 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
          && apk --no-cache --root /buildfs --virtual .rundeps add $RUNDEPS \
          && apk --no-cache --root /buildfs --allow-untrusted --virtual .rundeps_untrusted add $RUNDEPS_UNTRUSTED \
          && cd /buildfs \
-      && ls -la /imagefs \
       && echo hej \
          && find * -type d -exec mkdir -p /imagefs/{} + \
       && find * ! -type d ! -type c -exec ls -la {} + \
-         && find * ! -type d ! -type c -exec ls -la {} + | awk -F " " '{print $5" "$9}' > /installed_files.list.tmp1 \
-      && cat /apk-tool.filelist \
-      && cat /apk-tool.filelist | cut -d "/" -f 2 \
-      && cat /apk-tool.filelist | cut -d "/" -f 2 | xargs ls -lA \
-         && cat /apk-tool.filelist | cut -d "/" -f 2 | xargs ls -lA | awk -F " " '{print $5" "$9}' >> /apk-tool.filelist.tmp \
-      && cat /installed_files.list.tmp1 \
+         && find * ! -type d ! -type c -exec ls -la {} + | awk -F " " '{print $5" "$9}' > /imagefs/exclude.filelist \
+      && cat /exclude.filelist \
       && echo hej2 \
-      && cat /apk-tool.filelist.tmp \
-         && diff -dTNU 0 /apk-tool.filelist.tmp /installed_files.list.tmp1 | grep $'^[+]\t' | awk -F " ." '{print "."$2 >> "/imagefs/installed_files.list.tmp2"}' \
+      && cat /imagefs/exclude.filelist \
       && echo hej3 \
-      && cat /installed_files.list.tmp2 \
-         && diff -dTNU 0 /installed_files.list /installed_files.list.tmp2 | grep $'^[+]\t' | awk -F " ." '{print "."$2 >> "/imagefs/installed_files.list"; system("cp -a ."$2" /imagefs/")}' \
+      && diff -dTNU 0 /exclude.filelist /imagefs/exclude.filelist | grep $'^[+]\t' \
+         && diff -dTNU 0 /exclude.filelist /imagefs/exclude.filelist | grep $'^[+]\t' | awk -F " ." '{system("cp -a ."$2" /imagefs/")}' \
          && echo $ADDREPOS >> /etc/apk/repositories \
          && apk --no-cache add --initdb \
          && cp -a /tmp/rootfs/* /buildfs/ || /bin/true \
