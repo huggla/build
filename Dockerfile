@@ -46,8 +46,9 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
       && echo hej3 \
       && diff -dTNU 0 /onbuild-exclude.filelist /imagefs/onbuild-exclude.filelist \
       && echo hej4 \
-      && diff -dTNU 0 /onbuild-exclude.filelist /imagefs/onbuild-exclude.filelist | grep $'^[+]\t' \
+      && diff -dTNU 0 /onbuild-exclude.filelist /imagefs/onbuild-exclude.filelist | grep \$'^[+]\t' \
       && echo hej5 \
+      && exit 0 \
          && diff -dTNU 0 /onbuild-exclude.filelist /imagefs/onbuild-exclude.filelist | grep $'^[+]\t' | awk -F " ." '{system("cp -a ."$2" /imagefs/")}' \
          && echo $ADDREPOS >> /etc/apk/repositories \
          && apk --no-cache add --initdb \
