@@ -41,7 +41,10 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
          && find * -type d -exec mkdir -p /imagefs/{} + \
       && find * ! -type d ! -type c -exec ls -la {} + \
          && find * ! -type d ! -type c -exec ls -la {} + | awk -F " " '{print $5" "$9}' > /installed_files.list.tmp1 \
-         && cat /apk-tool.filelist | cut -d "/" -f 2 | xargs ls -la | awk -F " " '{print $5" "$9}' >> /apk-tool.filelist.tmp \
+      && cat /apk-tool.filelist \
+      && cat /apk-tool.filelist | cut -d "/" -f 2 \
+      && cat /apk-tool.filelist | cut -d "/" -f 2 | xargs ls -lA \
+         && cat /apk-tool.filelist | cut -d "/" -f 2 | xargs ls -lA | awk -F " " '{print $5" "$9}' >> /apk-tool.filelist.tmp \
       && cat /installed_files.list.tmp1 \
       && echo hej2 \
       && cat /apk-tool.filelist.tmp \
