@@ -36,7 +36,7 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
          && apk --no-cache --root /buildfs --virtual .rundeps add $RUNDEPS \
          && apk --no-cache --root /buildfs --allow-untrusted --virtual .rundeps_untrusted add $RUNDEPS_UNTRUSTED \
          && cd /buildfs \
-         && find . -type d -exec mkdir -p /imagefs/{} + \
+         && find * -type d -exec mkdir -p /imagefs/{} + \
       && ls -la /imagefs \
       && find . ! -type d -exec ls -la {} + \
          && find . ! -type d -exec ls -la {} + | awk -F " " '{print $5" "$9}' > /installed_files.list.tmp \
