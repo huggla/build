@@ -39,7 +39,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && apk --no-cache --root /buildfs --allow-untrusted --virtual .rundeps_untrusted add $RUNDEPS_UNTRUSTED \
          && cd /buildfs \
          && find * -type d -exec mkdir -p /imagefs/{} + \
-         && find * ! -type d ! -type c -exec ls -la {} + | awk -F " " '{print $5" "$9}' | sort - > /buildfs/onbuild-exclude.filelist \
+         && find * ! -type d ! -type c -exec ls -la {} + | awk -F " " '{print $5" "$9}' | sort -u - > /buildfs/onbuild-exclude.filelist \
          && comm -13 /onbuild-exclude.filelist /buildfs/onbuild-exclude.filelist | awk -F " " '{system("cp -a "$2" /imagefs/"$2)}' \
          && cat /onbuild-exclude.filelist /buildfs/onbuild-exclude.filelist | sort -u - > /imagefs/onbuild-exclude.filelist \
          && gzip -f /imagefs/onbuild-exclude.filelist \
