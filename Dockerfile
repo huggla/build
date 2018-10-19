@@ -78,7 +78,7 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
                   ln -sf "$(relpath "$exeDir" "/imagefs/usr/local/bin")/$exeName" "$exeName"; \
                fi; \
             done \
-         && chmod o= /tmp /imagefs/bin /imagefs/sbin /imagefs/usr/bin /imagefs/usr/sbin /imagefs/usr/local/bin/*  || /bin/true \
+         && chmod o= /tmp /imagefs/bin /imagefs/sbin /imagefs/usr/bin /imagefs/usr/sbin /imagefs/usr/local/bin/* || /bin/true \
          && while read file; \
             do \
                if [ ! -e "/imagefs$file" ]; \
