@@ -21,7 +21,7 @@ ONBUILD ARG BUILDCMDS
 
 #ONBUILD COPY --from=init / /
 #ONBUILD COPY --from=init / /imagefs/
-#ONBUILD COPY ./ /tmp/
+ONBUILD COPY ./ /tmp/
 
 ONBUILD RUN for dir in $MAKEDIRS; \
             do \
