@@ -1,10 +1,12 @@
-FROM huggla/busybox:20181017-edge as init
-FROM huggla/apk-tool:20181017-edge as image
+FROM huggla/apk-tool:20181017-edge as apk-tool
+FROM huggla/busybox:20181017-edge as busybox
+FROM huggla/busybox:20181017-edge as image
 
 COPY ./rootfs /
-COPY --from=init / /imagefs
+COPY --from=apk-tool /apk-tool /
+COPY --from=busybox / /imagefs
 
-RUN rm -f /imagefs/onbuild-exclude.filelist \
+RUN rm -f /onbuild-exclude.filelist /imagefs/onbuild-exclude.filelist \
  && chmod +x /usr/sbin/relpath
 
 ONBUILD ARG IMAGE
