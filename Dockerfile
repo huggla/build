@@ -20,7 +20,7 @@ ONBUILD ARG EXECUTABLES
 ONBUILD ARG BUILDCMDS
 
 #ONBUILD COPY --from=init / /
-#ONBUILD COPY --from=init / /imagefs/
+ONBUILD COPY --from=init /onbuild-exclude.filelist /onbuild-exclude.filelist
 ONBUILD COPY ./ /tmp/
 
 ONBUILD RUN for dir in $MAKEDIRS; \
