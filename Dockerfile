@@ -41,7 +41,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && find * -type d -exec mkdir -p /imagefs/{} + \
          && find * ! -type d ! -type c -exec ls -la {} + | awk -F " " '{print $5" "$9}' | sort - > /buildfs/onbuild-exclude.filelist \
          && comm -13 /onbuild-exclude.filelist /buildfs/onbuild-exclude.filelist | awk -F " " '{system("cp -a "$2" /imagefs/"$2)}' \
-         && cat /onbuild-exclude.filelist /buildfs/onbuild-exclude.filelist | uniq | sort - > /imagefs/onbuild-exclude.filelist \
+         && cat /onbuild-exclude.filelist /buildfs/onbuild-exclude.filelist | sort -u - > /imagefs/onbuild-exclude.filelist \
          && gzip -f /imagefs/onbuild-exclude.filelist \
          && echo $ADDREPOS >> /etc/apk/repositories \
          && apk --no-cache add --initdb \
