@@ -19,8 +19,7 @@ ONBUILD ARG REMOVEFILES
 ONBUILD ARG EXECUTABLES
 ONBUILD ARG BUILDCMDS
 
-#ONBUILD COPY --from=init / /
-ONBUILD COPY --from=init /onbuild-exclude.filelist /onbuild-exclude.filelist
+ONBUILD COPY --from=init / /
 ONBUILD COPY ./ /tmp/
 
 ONBUILD RUN for dir in $MAKEDIRS; \
@@ -38,7 +37,7 @@ ONBUILD RUN for dir in $MAKEDIRS; \
          && apk --no-cache --root /buildfs --allow-untrusted --virtual .rundeps_untrusted add $RUNDEPS_UNTRUSTED \
          && cd /buildfs \
          && find * -type d -exec mkdir -p /imagefs/{} + \
-         && find * ! -type d ! -type c -exec ls -la {} + | awk -F " " '{print $5" "$9}' | sort - >> /imagefs/onbuild-exclude.filelist \
+         && find * ! -type d ! -type c -exec ls -la {} + | awk -F " " '{print $5" "$9}' | sort - > /imagefs/onbuild-exclude.filelist \
          && comm -13 /onbuild-exclude.filelist /imagefs/onbuild-exclude.filelist | awk -F " " '{system("cp -a "$2" /imagefs/"$2)}' \
          && echo $ADDREPOS >> /etc/apk/repositories \
          && apk --no-cache add --initdb \
