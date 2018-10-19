@@ -20,10 +20,11 @@ ONBUILD ARG EXECUTABLES
 ONBUILD ARG BUILDCMDS
 
 ONBUILD COPY --from=init / /imagefs
-ONBUILD COPY --from=init /onbuild-exclude.filelist /onbuild-exclude.filelist
+ONBUILD COPY --from=init /onbuild-exclude.filelist.gz /onbuild-exclude.filelist.gz
 ONBUILD COPY ./ /tmp/
 
-ONBUILD RUN for dir in $MAKEDIRS; \
+ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
+         && for dir in $MAKEDIRS; \
             do \
                mkdir -p "$dir" "/imagefs$dir"; \
             done \
@@ -41,6 +42,7 @@ ONBUILD RUN for dir in $MAKEDIRS; \
          && find * ! -type d ! -type c -exec ls -la {} + | awk -F " " '{print $5" "$9}' | sort - > /buildfs/onbuild-exclude.filelist \
          && comm -13 /onbuild-exclude.filelist /buildfs/onbuild-exclude.filelist | awk -F " " '{system("cp -a "$2" /imagefs/"$2)}' \
          && cat /onbuild-exclude.filelist /buildfs/onbuild-exclude.filelist | uniq | sort - > /imagefs/onbuild-exclude.filelist \
+         && gzip /imagefs/onbuild-exclude.filelist \
          && echo $ADDREPOS >> /etc/apk/repositories \
          && apk --no-cache add --initdb \
          && cp -a /tmp/rootfs/* /buildfs/ || /bin/true \
