@@ -66,18 +66,22 @@ ONBUILD RUN chmod +x /usr/sbin/relpath \
                eval "$BUILDCMDS || exit 1"; \
             fi \
          && rm -rf /buildfs \
-         && for exe in $EXECUTABLES; \
-            do \
-               exe="/imagefs$exe"; \
-               exeDir="$(dirname "$exe")"; \
-               if [ "$exeDir" != "/imagefs/usr/local/bin" ]; \
-               then \
-                  exeName="$(basename "$exe")"; \
-                  cp -a "$exe" "/imagefs/usr/local/bin/"; \
-                  cd "$exeDir"; \
-                  ln -sf "$(relpath "$exeDir" "/imagefs/usr/local/bin")/$exeName" "$exeName"; \
-               fi; \
-            done \
+         && if [ -n "$EXECUTABLES" ]; \
+            then \
+               mkdir -p /imagefs/usr/local/bin; \
+               for exe in $EXECUTABLES; \
+               do \
+                  exe="/imagefs$exe"; \
+                  exeDir="$(dirname "$exe")"; \
+                  if [ "$exeDir" != "/imagefs/usr/local/bin" ]; \
+                  then \
+                     exeName="$(basename "$exe")"; \
+                     cp -a "$exe" "/imagefs/usr/local/bin/"; \
+                     cd "$exeDir"; \
+                     ln -sf "$(relpath "$exeDir" "/imagefs/usr/local/bin")/$exeName" "$exeName"; \
+                  fi; \
+               done; \
+            fi \
          && chmod o= /tmp /imagefs/bin /imagefs/sbin /imagefs/usr/bin /imagefs/usr/sbin /imagefs/usr/local/bin/* || /bin/true \
          && while read file; \
             do \
