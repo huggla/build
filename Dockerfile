@@ -15,11 +15,11 @@ ONBUILD ARG EXECUTABLES
 ONBUILD ARG BUILDCMDS
 
 ONBUILD COPY --from=init / /
-ONBUILD COPY --from=init / /imagefs/
+#ONBUILD COPY --from=init / /imagefs/
 ONBUILD COPY ./ /tmp/
 
 ONBUILD RUN chmod +x /usr/sbin/relpath \
-         && mkdir -p /buildfs \
+         && mkdir -p /buildfs /imagefs \
          && for dir in $MAKEDIRS; \
             do \
                mkdir -p "$dir" "/imagefs$dir"; \
