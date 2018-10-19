@@ -1,5 +1,8 @@
+FROM huggla/busybox:20181017-edge as init
 FROM huggla/apk-tool:20181017-edge as image
 
+COPY --from=init / /
+COPY --from=init / /imagefs
 COPY ./rootfs /
 
 ONBUILD ARG IMAGE
