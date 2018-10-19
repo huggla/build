@@ -4,7 +4,7 @@ FROM huggla/busybox:20181017-edge as image
 COPY ./rootfs /
 COPY --from=apk-tool /apk-tool /
 
-RUN rm -f /onbuild-exclude.filelist \
+RUN rm -f /onbuild-exclude.filelist* \
  && chmod +x /usr/sbin/relpath
 
 ONBUILD ARG IMAGE
