@@ -1,12 +1,10 @@
 FROM huggla/apk-tool:20181017-edge as apk-tool
-FROM huggla/busybox:20181017-edge as busybox
 FROM huggla/busybox:20181017-edge as image
 
 COPY ./rootfs /
 COPY --from=apk-tool /apk-tool /
-COPY --from=busybox / /imagefs
 
-RUN rm -f /onbuild-exclude.filelist /imagefs/onbuild-exclude.filelist \
+RUN rm -f /onbuild-exclude.filelist \
  && chmod +x /usr/sbin/relpath
 
 ONBUILD ARG IMAGE
@@ -42,7 +40,7 @@ ONBUILD RUN for dir in $MAKEDIRS; \
          && find * -type d -exec mkdir -p /imagefs/{} + \
          && find * ! -type d ! -type c -exec ls -la {} + | awk -F " " '{print $5" "$9}' | sort - > /buildfs/onbuild-exclude.filelist \
          && comm -13 /onbuild-exclude.filelist /buildfs/onbuild-exclude.filelist | awk -F " " '{system("cp -a "$2" /imagefs/"$2)}' \
-         && comm -123 /onbuild-exclude.filelist /buildfs/onbuild-exclude.filelist > /imagefs/onbuild-exclude.filelist
+         && comm -123 /onbuild-exclude.filelist /buildfs/onbuild-exclude.filelist > /imagefs/onbuild-exclude.filelist \
          && echo $ADDREPOS >> /etc/apk/repositories \
          && apk --no-cache add --initdb \
          && cp -a /tmp/rootfs/* /buildfs/ || /bin/true \
