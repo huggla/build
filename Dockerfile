@@ -1,5 +1,5 @@
 FROM huggla/busybox:20181017-edge as init
-FROM huggla/apk-tool:20181017-edge as build
+FROM huggla/apk-tool:20181017-edge as image
 
 COPY ./rootfs /
 COPY --from=init / /imagefs
@@ -19,7 +19,6 @@ ONBUILD ARG REMOVEFILES
 ONBUILD ARG EXECUTABLES
 ONBUILD ARG BUILDCMDS
 
-ONBUILD COPY --from=init / /
 ONBUILD COPY ./ /tmp/
 
 ONBUILD RUN for dir in $MAKEDIRS; \
