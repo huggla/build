@@ -19,7 +19,7 @@ ONBUILD ARG REMOVEFILES
 ONBUILD ARG EXECUTABLES
 ONBUILD ARG BUILDCMDS
 
-ONBUILD COPY --from=init / /imagefs
+#ONBUILD COPY --from=init / /imagefs
 ONBUILD COPY --from=init /onbuild-exclude.filelist.gz /onbuild-exclude.filelist.gz
 ONBUILD COPY ./ /tmp/
 
