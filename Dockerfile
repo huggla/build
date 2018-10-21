@@ -2,7 +2,9 @@ FROM huggla/alpine-official:20181017-edge as image
 
 COPY ./rootfs /
 
-RUN chmod +x /usr/sbin/relpath
+RUN chmod +x /usr/sbin/relpath \
+ && apk --no-cache --quiet manifest $APKS | awk -F "  " '{print "/"$2;}' > /apk-tool.filelist \
+ && find / -path "/etc/apk/*" -type f >> /apk-tool.filelist
 
 ONBUILD ARG IMAGE
 ONBUILD ARG DOWNLOADS
