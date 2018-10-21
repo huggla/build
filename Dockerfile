@@ -19,7 +19,7 @@ ONBUILD ARG EXECUTABLES
 ONBUILD ARG BUILDCMDS
 
 #ONBUILD COPY --from=init / /imagefs
-ONBUILD COPY --from=$BASEIMAGE /onbuild-exclude.filelist.gz /onbuild-exclude.filelist.gz
+ONBUILD COPY --from=${BASEIMAGE} /onbuild-exclude.filelist.gz /onbuild-exclude.filelist.gz
 ONBUILD COPY ./ /tmp/
 
 ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
