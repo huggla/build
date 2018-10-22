@@ -8,6 +8,8 @@ RUN chmod +x /usr/sbin/relpath \
 
 ONBUILD ARG BASEIMAGE
 ONBUILD ENV BASEIMAGE ${BASEIMAGE:-huggla/busybox:20181017-edge}
+ONBUILD ARG INITCOPYSOURCE="${INITCOPYSOURCE:-/}"
+ONBUILD ARG INITCOPYDESTINATION="${INITCOPYDESTINATION:-/imagefs}"
 #ONBUILD ARG apa=${BASEIMAGE:-huggla/busybox:20181017-edge}
 ONBUILD ARG DOWNLOADS
 ONBUILD ARG ADDREPOS
@@ -20,8 +22,8 @@ ONBUILD ARG REMOVEFILES
 ONBUILD ARG EXECUTABLES
 ONBUILD ARG BUILDCMDS
 
-#ONBUILD COPY --from=init / /imagefs
-ONBUILD COPY --from=${BASEIMAGE} /onbuild-exclude.filelist.gz /onbuild-exclude.filelist.gz
+ONBUILD COPY --from=init $INITCOPYSOURCE $INITCOPYDESTINATION
+#ONBUILD COPY --from=${BASEIMAGE} /onbuild-exclude.filelist.gz /onbuild-exclude.filelist.gz
 ONBUILD COPY ./ /tmp/
 
 ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
