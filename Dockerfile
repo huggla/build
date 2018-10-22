@@ -24,7 +24,7 @@ ONBUILD COPY --from=base /onbuild-exclude.filelist.gz /onbuild-exclude.filelist.
 ONBUILD COPY ./ /tmp/
 
 ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
-         && mkdir /imagefs \
+         && mkdir -p /imagefs \
          && for dir in $MAKEDIRS; \
             do \
                mkdir -p "$dir" "/imagefs$dir"; \
