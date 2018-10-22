@@ -20,10 +20,10 @@ ONBUILD ARG EXECUTABLES
 ONBUILD ARG BUILDCMDS
 
 ONBUILD COPY --from=init ${INITCOPYSOURCE:-/} ${INITCOPYDESTINATION:-/imagefs}
-ONBUILD COPY --from=base /onbuild-exclude.filelist.gz /onbuild-exclude.filelist.gz
+ONBUILD COPY --from=base /onbuild-exclude.filelist.xz /onbuild-exclude.filelist.xz
 ONBUILD COPY ./ /tmp/
 
-ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
+ONBUILD RUN unxz /onbuild-exclude.filelist.xz \
          && mkdir -p /imagefs \
          && for dir in $MAKEDIRS; \
             do \
@@ -42,8 +42,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && find * -type d -exec mkdir -p /imagefs/{} + \
          && find * ! -type d ! -type c -exec ls -la {} + | awk -F " " '{print $5" "$9}' | sort -u - > /buildfs/onbuild-exclude.filelist \
          && comm -13 /onbuild-exclude.filelist /buildfs/onbuild-exclude.filelist | awk -F " " '{system("cp -a "$2" /imagefs/"$2)}' \
-         && cat /onbuild-exclude.filelist /buildfs/onbuild-exclude.filelist | sort -u - > /imagefs/onbuild-exclude.filelist \
-         && gzip -f /imagefs/onbuild-exclude.filelist \
+         && cat /onbuild-exclude.filelist /buildfs/onbuild-exclude.filelist | sort -u - | xz -9 > /imagefs/onbuild-exclude.filelist.xz \
          && echo $ADDREPOS >> /etc/apk/repositories \
          && apk --no-cache add --initdb \
          && cp -a /tmp/rootfs/* /buildfs/ || /bin/true \
