@@ -6,11 +6,8 @@ RUN chmod +x /usr/sbin/relpath \
  && apk --no-cache --quiet manifest $APKS | awk -F "  " '{print "/"$2;}' > /apk-tool.filelist \
  && find / -path "/etc/apk/*" -type f >> /apk-tool.filelist
 
-ONBUILD ARG BASEIMAGE
-ONBUILD ENV BASEIMAGE ${BASEIMAGE:-huggla/busybox:20181017-edge}
-ONBUILD ARG INITCOPYSOURCE="${INITCOPYSOURCE:-/}"
-ONBUILD ARG INITCOPYDESTINATION="${INITCOPYDESTINATION:-/imagefs}"
-#ONBUILD ARG apa=${BASEIMAGE:-huggla/busybox:20181017-edge}
+ONBUILD ARG INITCOPYSOURCE
+ONBUILD ARG INITCOPYDESTINATION
 ONBUILD ARG DOWNLOADS
 ONBUILD ARG ADDREPOS
 ONBUILD ARG BUILDDEPS
@@ -22,7 +19,7 @@ ONBUILD ARG REMOVEFILES
 ONBUILD ARG EXECUTABLES
 ONBUILD ARG BUILDCMDS
 
-ONBUILD COPY --from=init $INITCOPYSOURCE $INITCOPYDESTINATION
+ONBUILD COPY --from=init ${INITCOPYSOURCE:-/} ${INITCOPYDESTINATION:-/imagefs}
 ONBUILD COPY --from=base /onbuild-exclude.filelist.gz /onbuild-exclude.filelist.gz
 ONBUILD COPY ./ /tmp/
 
