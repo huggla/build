@@ -1,8 +1,12 @@
 FROM huggla/alpine-official:20181017-edge as image
 
-COPY ./rootfs /
+COPY ./rootfs /tmp/rootfs
 
-RUN chmod +x /usr/sbin/relpath \
+RUN chown -R 0:102 /tmp/rootfs \
+ && chmod -R o= /tmp/rootfs \
+ && chmod u=rx,go= /tmp/rootfs/usr/sbin/relpath \
+ && cp -a /tmp/rootfs/* / \
+ && rm -rf /tmp/rootfs \
  && apk --no-cache --quiet manifest $APKS | awk -F "  " '{print "/"$2;}' > /apk-tool.filelist \
  && find / -path "/etc/apk/*" -type f >> /apk-tool.filelist
 
@@ -47,8 +51,9 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                mkdir -p "/buildfs$(dirname "$file")"; \
                touch "/buildfs$file"; \
             done \
-         && chgrp -R 102 /buildfs \
-         && chmod -R o= /buildfs \
+         && chgrp -R 102 /buildfs /tmp \
+         && chmod -R o= /buildfs /tmp \
+         && cp -a /tmp/rootfs/* /buildfs/ || /bin/true \
          && cd /buildfs \
          && find * -type d -exec mkdir -p /imagefs/{} + \
          && find * ! -type d ! -type c -exec ls -la {} + | awk -F " " '{print $5" "$9}' | sort -u - > /buildfs/onbuild-exclude.filelist \
@@ -56,7 +61,6 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && cat /onbuild-exclude.filelist /buildfs/onbuild-exclude.filelist | sort -u - | gzip -9 > /imagefs/onbuild-exclude.filelist.gz \
          && echo $ADDREPOS >> /etc/apk/repositories \
          && apk --no-cache add --initdb \
-         && cp -a /tmp/rootfs/* /buildfs/ || /bin/true \
          && cp -a /tmp/buildfs/* /buildfs/ || /bin/true \
          && apk --no-cache --virtual .builddeps add $BUILDDEPS \
          && apk --no-cache --allow-untrusted --virtual .builddeps_untrusted add $BUILDDEPS_UNTRUSTED \
@@ -74,8 +78,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                apk --no-cache --purge del .downloaddeps; \
                rm -rf $downloadDir; \
             fi \
-         && cp -a /tmp/rootfs/* /imagefs/ || /bin/true \
-         && if [ -n "$BUILDCMDS" ]; \
+          && if [ -n "$BUILDCMDS" ]; \
             then \
                cd $buildDir; \
                eval "$BUILDCMDS || exit 1"; \
