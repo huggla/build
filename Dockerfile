@@ -37,6 +37,8 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && apk --no-cache --root /buildfs add --initdb \
          && apk --no-cache --root /buildfs --virtual .rundeps add $RUNDEPS \
          && apk --no-cache --root /buildfs --allow-untrusted --virtual .rundeps_untrusted add $RUNDEPS_UNTRUSTED \
+         && chgrp -R 102 /buildfs \
+         && chmod -R o= /buildfs \
          && cd /buildfs \
          && find * -type d -exec mkdir -p /imagefs/{} + \
          && find * ! -type d ! -type c -exec ls -la {} + | awk -F " " '{print $5" "$9}' | sort -u - > /buildfs/onbuild-exclude.filelist \
