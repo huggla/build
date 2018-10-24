@@ -28,10 +28,6 @@ ONBUILD COPY ./ /tmp/
 
 ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && mkdir -p /imagefs \
-         && for dir in $MAKEDIRS; \
-            do \
-               mkdir -p "$dir" "/imagefs$dir"; \
-            done \
          && while read file; \
             do \
                mkdir -p "/buildfs$(dirname $file)"; \
@@ -52,9 +48,14 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && cp -a /tmp/buildfs/* /buildfs/ || /bin/true \
          && apk --no-cache --virtual .builddeps add $BUILDDEPS \
          && apk --no-cache --allow-untrusted --virtual .builddeps_untrusted add $BUILDDEPS_UNTRUSTED \
+         && for dir in $MAKEDIRS; \
+            do \
+               mkdir -p "$dir" "/imagefs$dir"; \
+               chgrp 102 $dir; \
+               chmod o= $dir; \
+            done \
          && for file in $MAKEFILES; \
             do \
-               mkdir -p "$(dirname $file)"; \
                touch $file; \
                chgrp 102 $file; \
                chmod o= $file; \
