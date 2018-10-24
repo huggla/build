@@ -52,6 +52,13 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && cp -a /tmp/buildfs/* /buildfs/ || /bin/true \
          && apk --no-cache --virtual .builddeps add $BUILDDEPS \
          && apk --no-cache --allow-untrusted --virtual .builddeps_untrusted add $BUILDDEPS_UNTRUSTED \
+         && for file in $MAKEFILES; \
+            do \
+               mkdir -p "$(dirname $file)"; \
+               touch $file; \
+               chgrp 102 $file; \
+               chmod o= $file; \
+            done \
          && buildDir="$(mktemp -d -p /buildfs/tmp)" \
          && if [ -n "$DOWNLOADS" ]; \
             then \
