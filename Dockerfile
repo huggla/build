@@ -32,7 +32,7 @@ ONBUILD COPY --from=base /onbuild-exclude.filelist.gz /onbuild-exclude.filelist.
 ONBUILD COPY ./ /tmp/
 
 ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
-         && mkdir -p /imagefs \
+         && mkdir -p /imagefs /buildfs/usr/local/bin \
          && while read file; \
             do \
                mkdir -p "/buildfs$(dirname $file)"; \
@@ -53,7 +53,8 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
             done \
          && chgrp -R 102 /buildfs /tmp \
          && chmod -R o= /buildfs /tmp \
-         && cp -a /tmp/rootfs/* /buildfs/ || /bin/true \
+         && cp -a /tmp/rootfs/* /buildfs/ || true \
+         && chgrp 112 /buildfs/etc /buildfs/usr /buildfs/usr/bin /buildfs/usr/lib buildfs/usr/local buildfs/usr/local/bin || true \
          && cd /buildfs \
          && find * -type d -exec mkdir -p /imagefs/{} + \
          && find * ! -type d ! -type c -exec ls -la {} + | awk -F " " '{print $5" "$9}' | sort -u - > /buildfs/onbuild-exclude.filelist \
@@ -62,7 +63,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && chmod go= /imagefs/onbuild-exclude.filelist.gz \
          && echo $ADDREPOS >> /etc/apk/repositories \
          && apk --no-cache add --initdb \
-         && cp -a /tmp/buildfs/* /buildfs/ || /bin/true \
+         && cp -a /tmp/buildfs/* /buildfs/ || true \
          && apk --no-cache --virtual .builddeps add $BUILDDEPS \
          && apk --no-cache --allow-untrusted --virtual .builddeps_untrusted add $BUILDDEPS_UNTRUSTED \
          && buildDir="$(mktemp -d -p /buildfs/tmp)" \
@@ -75,7 +76,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                do \
                   wget "$download"; \
                done; \
-               tar -xvp -f $downloadDir/* -C $buildDir || /bin/true; \
+               tar -xvp -f $downloadDir/* -C $buildDir || true; \
                apk --no-cache --purge del .downloaddeps; \
                rm -rf $downloadDir; \
             fi \
@@ -87,7 +88,6 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && rm -rf /buildfs \
          && if [ -n "$EXECUTABLES" ]; \
             then \
-               mkdir -p /imagefs/usr/local/bin; \
                for exe in $EXECUTABLES; \
                do \
                   exe="/imagefs$exe"; \
