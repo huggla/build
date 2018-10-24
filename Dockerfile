@@ -37,6 +37,15 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && apk --no-cache --root /buildfs add --initdb \
          && apk --no-cache --root /buildfs --virtual .rundeps add $RUNDEPS \
          && apk --no-cache --root /buildfs --allow-untrusted --virtual .rundeps_untrusted add $RUNDEPS_UNTRUSTED \
+         && for dir in $MAKEDIRS; \
+            do \
+               mkdir -p "$dir" "/buildfs$dir"; \
+            done \
+         && for file in $MAKEFILES; \
+            do \
+               mkdir -p "/buildfs$(dirname "$file")"; \
+               touch "/buildfs$file"; \
+            done \
          && chgrp -R 102 /buildfs \
          && chmod -R o= /buildfs \
          && cd /buildfs \
@@ -50,18 +59,6 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && cp -a /tmp/buildfs/* /buildfs/ || /bin/true \
          && apk --no-cache --virtual .builddeps add $BUILDDEPS \
          && apk --no-cache --allow-untrusted --virtual .builddeps_untrusted add $BUILDDEPS_UNTRUSTED \
-         && for dir in $MAKEDIRS; \
-            do \
-               mkdir -p "$dir" "/imagefs$dir"; \
-               chgrp 102 $dir; \
-               chmod o= $dir; \
-            done \
-         && for file in $MAKEFILES; \
-            do \
-               touch $file; \
-               chgrp 102 $file; \
-               chmod o= $file; \
-            done \
          && buildDir="$(mktemp -d -p /buildfs/tmp)" \
          && if [ -n "$DOWNLOADS" ]; \
             then \
