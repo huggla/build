@@ -17,6 +17,7 @@ ONBUILD ARG BUILDDEPS_UNTRUSTED
 ONBUILD ARG RUNDEPS
 ONBUILD ARG RUNDEPS_UNTRUSTED
 ONBUILD ARG MAKEDIRS
+ONBUILD ARG MAKEFILES
 ONBUILD ARG REMOVEFILES
 ONBUILD ARG EXECUTABLES
 ONBUILD ARG BUILDCMDS
@@ -96,6 +97,9 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                   fi; \
                done; \
             fi \
-         && chmod o= /tmp /imagefs/bin /imagefs/sbin /imagefs/usr/bin /imagefs/usr/sbin /imagefs/usr/local/bin/* || /bin/true \
-         && rm -rf $REMOVEFILES /imagefs/sys /imagefs/dev /imagefs/proc /tmp/* /imagefs/tmp/* /imagefs/lib/apk /imagefs/etc/apk /imagefs/var/cache/apk/* \
+         && rm -rf /imagefs/sys /imagefs/dev /imagefs/proc /tmp/* /imagefs/tmp/* /imagefs/lib/apk /imagefs/etc/apk /imagefs/var/cache/apk/* \
+         && for file in $REMOVEFILES; \
+            do \
+               rm -rf "/imagefs$file"; \
+            done \
          && apk --no-cache --purge del .builddeps .builddeps_untrusted
