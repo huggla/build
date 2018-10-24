@@ -54,7 +54,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && chgrp -R 102 /buildfs /tmp \
          && chmod -R o= /buildfs /tmp \
          && cp -a /tmp/rootfs/* /buildfs/ || true \
-         && chgrp 112 /buildfs/etc /buildfs/usr /buildfs/usr/bin /buildfs/usr/lib buildfs/usr/local buildfs/usr/local/bin || true \
+         && chgrp 112 /buildfs/tmp /buildfs/etc /buildfs/usr /buildfs/usr/bin /buildfs/usr/lib buildfs/usr/local buildfs/usr/local/bin || true \
          && cd /buildfs \
          && find * -type d -exec mkdir -p /imagefs/{} + \
          && find * ! -type d ! -type c -exec ls -la {} + | awk -F " " '{print $5" "$9}' | sort -u - > /buildfs/onbuild-exclude.filelist \
