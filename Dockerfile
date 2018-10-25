@@ -1,13 +1,8 @@
 FROM huggla/alpine-official:20181017-edge as image
 
-COPY ./rootfs /tmp/rootfs
+COPY ./rootfs /
 
-RUN chgrp -R 102 /tmp/rootfs \
- && chmod -R o= /tmp/rootfs \
- && chmod u=rx,go= /tmp/rootfs/usr/sbin/relpath \
- && cp -a /tmp/rootfs/* / \
- && rm -rf /tmp/rootfs \
- && apk --no-cache --quiet manifest $APKS | awk -F "  " '{print "/"$2;}' > /apk-tool.filelist \
+RUN apk --no-cache --quiet manifest $APKS | awk -F "  " '{print "/"$2;}' > /apk-tool.filelist \
  && find / -path "/etc/apk/*" -type f >> /apk-tool.filelist
 
 ONBUILD ARG CONTENTSOURCE1
@@ -51,12 +46,11 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                mkdir -p "/buildfs$(dirname "$file")"; \
                touch "/buildfs$file"; \
             done \
-         && chgrp -R 102 /buildfs /tmp \
-         && chmod -R o= /buildfs /tmp \
          && cp -a /tmp/rootfs/* /buildfs/ || true \
-         && chgrp 112 /buildfs/tmp /buildfs/etc /buildfs/usr /buildfs/usr/lib /buildfs/usr/local || true \
-         && chgrp 0 /buildfs/bin /buildfs/sbin /buildfs/usr/bin /buildfs/usr/sbin || true \
-         && chgrp 101 /buildfs/usr/local/bin || true \
+         && chmod 755 /buildfs \
+         && chmod 700 /buildfs/bin /buildfs/sbin /buildfs/usr/bin /buildfs/usr/sbin || true \
+         && chmod 750 /buildfs/etc /buildfs/lib /buildfs/usr /buildfs/var /buildfs/run /buildfs/usr/lib /buildfs/usr/local /buildfs/var/cache /buildfs/usr/local/bin || true \
+         && chmod 770 /buildfs/tmp || true \
          && cd /buildfs \
          && find * -type d -exec mkdir -p /imagefs/{} + \
          && find * ! -type d ! -type c -exec ls -la {} + | awk -F " " '{print $5" "$9}' | sort -u - > /buildfs/onbuild-exclude.filelist \
