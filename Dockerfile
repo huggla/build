@@ -3,7 +3,8 @@ FROM huggla/alpine-official:20181017-edge as image
 COPY ./rootfs /
 
 RUN apk --no-cache --quiet manifest $APKS | awk -F "  " '{print "/"$2;}' > /apk-tool.filelist \
- && find / -path "/etc/apk/*" -type f >> /apk-tool.filelist
+ && find / -path "/etc/apk/*" -type f >> /apk-tool.filelist \
+ && chmod u+x /usr/sbin/relpath
 
 ONBUILD ARG CONTENTSOURCE1
 ONBUILD ARG CONTENTDESTINATION1
