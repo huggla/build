@@ -48,9 +48,9 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                touch "/buildfs$file"; \
             done \
          && cp -a /tmp/rootfs/* /buildfs/ || true \
-         && chmod 755 /buildfs /buildfs/lib /buildfs/usr /buildfs/usr/local /buildfs/usr/local/bin || true \
+         && chmod 755 /buildfs /buildfs/lib /buildfs/usr /buildfs/usr/lib /buildfs/usr/local /buildfs/usr/local/bin || true \
          && chmod 700 /buildfs/bin /buildfs/sbin /buildfs/usr/bin /buildfs/usr/sbin || true \
-         && chmod 750 /buildfs/etc /buildfs/var /buildfs/run /buildfs/usr/lib /buildfs/var/cache /buildfs/start /buildfs/stop || true \
+         && chmod 750 /buildfs/etc /buildfs/var /buildfs/run /buildfs/var/cache /buildfs/start /buildfs/stop || true \
          && chmod 770 /buildfs/tmp || true \
          && cd /buildfs \
          && find * -type d -exec mkdir -p /imagefs/{} + \
