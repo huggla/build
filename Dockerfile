@@ -48,14 +48,14 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                touch "/buildfs$file"; \
             done \
          && cp -a /tmp/rootfs/* /buildfs/ || true \
-         && chmod 755 /buildfs /buildfs/lib /buildfs/usr /buildfs/usr/lib /buildfs/usr/local /buildfs/usr/local/bin || true \
-         && chmod 700 /buildfs/bin /buildfs/sbin /buildfs/usr/bin /buildfs/usr/sbin || true \
-         && chmod 750 /buildfs/etc /buildfs/var /buildfs/run /buildfs/var/cache /buildfs/start /buildfs/stop || true \
-         && chmod 770 /buildfs/tmp || true \
          && cd /buildfs \
          && find * -type d -exec mkdir -p /imagefs/{} + \
          && find * ! -type d ! -type c -exec ls -la {} + | awk -F " " '{print $5" "$9}' | sort -u - > /onbuild-exclude.filelist.tmp \
          && comm -13 /onbuild-exclude.filelist /onbuild-exclude.filelist.tmp | awk -F " " '{system("cp -a "$2" /imagefs/"$2)}' \
+         && chmod 755 /imagefs /imagefs/lib /imagefs/usr /imagefs/usr/lib /imagefs/usr/local /imagefs/usr/local/bin || true \
+         && chmod 700 /imagefs/bin /imagefs/sbin /imagefs/usr/bin /imagefs/usr/sbin || true \
+         && chmod 750 /imagefs/etc /imagefs/var /imagefs/run /imagefs/var/cache /imagefs/start /imagefs/stop || true \
+         && chmod 770 /imagefs/tmp || true \
          && cat /onbuild-exclude.filelist /onbuild-exclude.filelist.tmp | sort -u - | gzip -9 > /imagefs/onbuild-exclude.filelist.gz \
          && chmod go= /imagefs/onbuild-exclude.filelist.gz \
          && echo $ADDREPOS >> /etc/apk/repositories \
