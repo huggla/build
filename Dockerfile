@@ -51,7 +51,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && cd /buildfs \
          && find * -type d -exec mkdir -p /imagefs/{} + \
          && find * ! -type d ! -type c -exec ls -la {} + | awk -F " " '{print $5" "$9}' | sort -u - > /onbuild-exclude.filelist.tmp \
-         && echo "/buildfs" && ls -laR /buildfs && echo \
+       #  && echo "/buildfs" && ls -laR /buildfs && echo \
          && comm -13 /onbuild-exclude.filelist /onbuild-exclude.filelist.tmp | awk -F " " '{system("cp -a "$2" /imagefs/"$2)}' \
          && chmod 755 /imagefs /imagefs/lib /imagefs/usr /imagefs/usr/lib /imagefs/usr/local /imagefs/usr/local/bin || true \
          && chmod 700 /imagefs/bin /imagefs/sbin /imagefs/usr/bin /imagefs/usr/sbin || true \
@@ -59,7 +59,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && chmod 770 /imagefs/tmp || true \
          && cat /onbuild-exclude.filelist /onbuild-exclude.filelist.tmp | sort -u - | gzip -9 > /imagefs/onbuild-exclude.filelist.gz \
          && chmod go= /imagefs/onbuild-exclude.filelist.gz \
-         && echo "/imagefs" && ls -laR /imagefs && echo \
+       #  && echo "/imagefs" && ls -laR /imagefs && echo \
          && echo $ADDREPOS >> /etc/apk/repositories \
          && apk --no-cache add --initdb \
          && cp -a /tmp/buildfs/* /buildfs/ || true \
