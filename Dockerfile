@@ -94,7 +94,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                   then \
                      exeName="$(basename "$exe")"; \
                      cp -a "$exe" "/imagefs/usr/local/bin/"; \
-                     chmod o= "$exe"; \
+                     chmod o= "/imagefs/usr/local/bin/$exeName"; \
                      cd "$exeDir"; \
                      ln -sf "$(relpath "$exeDir" "/imagefs/usr/local/bin")/$exeName" "$exeName"; \
                   fi; \
