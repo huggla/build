@@ -48,6 +48,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                touch "/buildfs$file"; \
             done \
          && cp -a /tmp/rootfs/* /buildfs/ || true \
+         && chmod ug=rx,o= /buildfs/usr/local/bin/* || true \
          && cd /buildfs \
          && find * -type d -exec mkdir -p /imagefs/{} + \
          && find * ! -type d ! -type c -exec ls -la {} + | awk -F " " '{print $5" "$9}' | sort -u - > /onbuild-exclude.filelist.tmp \
