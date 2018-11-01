@@ -1,4 +1,4 @@
-ARG TAG
+ARG TAG="20181101-edge"
 
 FROM huggla/alpine-official:$TAG as image
 
