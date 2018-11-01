@@ -1,4 +1,6 @@
-FROM huggla/alpine-official:20181101-edge as image
+ARG TAG
+
+FROM huggla/alpine-official:$TAG as image
 
 COPY ./rootfs /
 
