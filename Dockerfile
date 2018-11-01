@@ -1,4 +1,4 @@
-FROM huggla/alpine-official:20181017-edge as image
+FROM huggla/alpine-official:20181101-edge as image
 
 COPY ./rootfs /
 
