@@ -22,6 +22,7 @@ ONBUILD ARG MAKEDIRS
 ONBUILD ARG MAKEFILES
 ONBUILD ARG REMOVEFILES
 ONBUILD ARG EXECUTABLES
+ONBUILD ARG EXPOSEFUNCTIONS
 ONBUILD ARG BUILDCMDS
 
 ONBUILD COPY --from=content1 ${CONTENTSOURCE1:-/} /buildfs${CONTENTDESTINATION1:-/}
@@ -100,6 +101,17 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                      cd "$exeDir"; \
                      ln -sf "$(relpath "$exeDir" "/imagefs/usr/local/bin")/$exeName" "$exeName"; \
                   fi; \
+               done; \
+            fi \
+         && if [ -n "$EXPOSEFUNCTIONS" ]; \
+            then \
+               mkdir -p /imagefs/usr/local/bin/functions; \
+               cd /imagefs/usr/local/bin; \
+               ln -s ../../../start/includeFunctions ./; \
+               cd /imagefs/usr/local/bin/functions; \
+               for func in $EXPOSEFUNCTIONS; \
+               do \
+                  ln -s ../../../../start/functions/$func ./;
                done; \
             fi \
          && rm -rf /imagefs/sys /imagefs/dev /imagefs/proc /tmp/* /imagefs/tmp/* /imagefs/lib/apk /imagefs/etc/apk /imagefs/var/cache/apk/* \
