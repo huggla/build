@@ -111,7 +111,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                cd /imagefs/usr/local/bin/functions; \
                for func in $EXPOSEFUNCTIONS; \
                do \
-                  ln -s ../../../../start/functions/$func; ./
+                  ln -s ../../../../start/functions/$func ./; \
                done; \
             fi \
          && rm -rf /imagefs/sys /imagefs/dev /imagefs/proc /tmp/* /imagefs/tmp/* /imagefs/lib/apk /imagefs/etc/apk /imagefs/var/cache/apk/* \
