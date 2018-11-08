@@ -4,8 +4,7 @@ FROM huggla/alpine-official:$TAG as image
 
 COPY ./rootfs /
 
-RUN find / -path "/etc/apk/*" -type f > /apk-tool.filelist \
- && chmod u+x /usr/sbin/relpath
+RUN chmod u+x /usr/sbin/relpath
 
 ONBUILD ARG CONTENTSOURCE1
 ONBUILD ARG CONTENTDESTINATION1
@@ -31,15 +30,23 @@ ONBUILD COPY ./ /tmp/
 
 ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && mkdir -p /imagefs /buildfs/usr/local/bin \
-         && while read file; \
-            do \
-               mkdir -p "/buildfs$(dirname $file)"; \
-               cp -a "$file" "/buildfs$file"; \
-            done < /apk-tool.filelist \
-         && echo $ADDREPOS >> /buildfs/etc/apk/repositories \
-         && apk --no-cache --root /buildfs add --initdb \
-         && apk --no-cache --root /buildfs --virtual .rundeps add $RUNDEPS \
-         && apk --no-cache --root /buildfs --allow-untrusted --virtual .rundeps_untrusted add $RUNDEPS_UNTRUSTED \
+         && if [ -n "$ADDREPOS" ]; \
+            then \
+               for repo in $ADDREPOS; \
+               do \
+                  if [ "$repo" != "http://dl-cdn.alpinelinux.org/alpine/edge/testing" ] && [ "$repo" != "https://dl-cdn.alpinelinux.org/alpine/edge/testing" ]; \
+                  then \
+                     echo $repo > /tmp/repo; \
+                     apk --allow-untrusted --repositories-file /tmp/repo update; \
+                  fi; \
+                  echo $repo >> /etc/apk/repositories; \
+               done; \
+               rm -f /tmp/repo; \
+            fi \
+         && apk --root /buildfs add --initdb \
+         && ln -s /var/cache/apk/* /buildfs/var/cache/apk/ \
+         && apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /buildfs --virtual .rundeps add $RUNDEPS \
+         && apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /buildfs --allow-untrusted --virtual .rundeps_untrusted add $RUNDEPS_UNTRUSTED \
          && for dir in $MAKEDIRS; \
             do \
                mkdir -p "$dir" "/buildfs$dir"; \
@@ -61,15 +68,13 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && chmod 770 /imagefs/tmp || true \
          && cat /onbuild-exclude.filelist /onbuild-exclude.filelist.tmp | sort -u - | gzip -9 > /imagefs/onbuild-exclude.filelist.gz \
          && chmod go= /imagefs/onbuild-exclude.filelist.gz \
-         && echo $ADDREPOS >> /etc/apk/repositories \
-         && apk --no-cache add --initdb \
+         && apk add --initdb \
          && cp -a /tmp/buildfs/* /buildfs/ || true \
-         && apk --no-cache --virtual .builddeps add $BUILDDEPS \
-         && apk --no-cache --allow-untrusted --virtual .builddeps_untrusted add $BUILDDEPS_UNTRUSTED \
+         && apk --virtual .builddeps add $BUILDDEPS \
+         && apk --allow-untrusted --virtual .builddeps_untrusted add $BUILDDEPS_UNTRUSTED \
          && buildDir="$(mktemp -d -p /buildfs/tmp)" \
          && if [ -n "$DOWNLOADS" ]; \
             then \
-               apk --no-cache --virtual .downloaddeps add ssl_client; \
                downloadDir="$(mktemp -d -p /buildfs/tmp)"; \
                cd $downloadDir; \
                for download in $DOWNLOADS; \
@@ -77,7 +82,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                   wget "$download"; \
                done; \
                tar -xvp -f $downloadDir/* -C $buildDir || true; \
-               apk --no-cache --purge del .downloaddeps; \
+               apk --purge del .downloaddeps; \
                rm -rf $downloadDir; \
             fi \
           && if [ -n "$BUILDCMDS" ]; \
@@ -118,4 +123,4 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
             do \
                rm -rf "/imagefs$file"; \
             done \
-         && apk --no-cache --purge del .builddeps .builddeps_untrusted
+         && apk --purge del .builddeps .builddeps_untrusted
