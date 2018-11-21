@@ -76,7 +76,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && buildDir="$(mktemp -d -p /buildfs/tmp)" \
          && if [ -n "$DOWNLOADS" ]; \
             then \
-               apk --virtual .downloaddeps add wget; \
+               apk --virtual .downloaddeps add wget ssl_client; \
                if [ -n "$DOWNLOADSDIR" ]; \
                then \
                   downloadsDir="/imagefs$DOWNLOADSDIR"; \
