@@ -93,6 +93,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                then \
                   tar -xvp -f $downloadsDir/*.tar* -C $buildDir || true; \
                fi; \
+               DOWNLOADSDIR=$downloadsDir; \
                apk --purge del .downloaddeps; \
             fi \
           && if [ -n "$BUILDCMDS" ]; \
