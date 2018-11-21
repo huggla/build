@@ -11,6 +11,7 @@ ONBUILD ARG CONTENTDESTINATION1
 ONBUILD ARG CONTENTSOURCE2
 ONBUILD ARG CONTENTDESTINATION2
 ONBUILD ARG DOWNLOADS
+ONBUILD ARG DOWNLOADSDIR
 ONBUILD ARG ADDREPOS
 ONBUILD ARG BUILDDEPS
 ONBUILD ARG BUILDDEPS_UNTRUSTED
@@ -75,14 +76,15 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && buildDir="$(mktemp -d -p /buildfs/tmp)" \
          && if [ -n "$DOWNLOADS" ]; \
             then \
-               apk --virtual .downloaddeps add wget \
-               downloadDir="$(mktemp -d -p /buildfs/tmp)"; \
-               cd $downloadDir; \
+               apk --virtual .downloaddeps add wget; \
+               DOWNLOADSDIR=${DOWNLOADSDIR:-"$(mktemp -d -p /buildfs/tmp)"}; \
+               mkdir -p $DOWNLOADSDIR; \
+               cd $DOWNLOADSDIR; \
                for download in $DOWNLOADS; \
                do \
                   wget "$download"; \
                done; \
-               tar -xvp -f $downloadDir/*.tar* -C $buildDir || true; \
+               tar -xvp -f $DOWNLOADSDIR/*.tar* -C $buildDir || true; \
                apk --purge del .downloaddeps; \
             fi \
           && if [ -n "$BUILDCMDS" ]; \
