@@ -75,15 +75,15 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && buildDir="$(mktemp -d -p /buildfs/tmp)" \
          && if [ -n "$DOWNLOADS" ]; \
             then \
+               apk --virtual .downloaddeps add wget \
                downloadDir="$(mktemp -d -p /buildfs/tmp)"; \
                cd $downloadDir; \
                for download in $DOWNLOADS; \
                do \
                   wget "$download"; \
                done; \
-               tar -xvp -f $downloadDir/* -C $buildDir || true; \
+               tar -xvp -f $downloadDir/*.tar* -C $buildDir || true; \
                apk --purge del .downloaddeps; \
-               rm -rf $downloadDir; \
             fi \
           && if [ -n "$BUILDCMDS" ]; \
             then \
