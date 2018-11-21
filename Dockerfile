@@ -87,7 +87,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                cd $downloadsDir; \
                for download in $DOWNLOADS; \
                do \
-                  wget "$download"; \
+                  wget --no-check-certificate "$download"; \
                done; \
                if [ -n "$DOWNLOADSDIR" ]; \
                then \
