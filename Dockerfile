@@ -55,7 +55,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                   MAKEDIRS="$MAKEDIRS "; \
                fi; \
                MAKEDIRS=$MAKEDIRS$DOWNLOADSDIR; \
-               DOWNLOADSDIR="/imagefs$DOWNLOADSDIR"; \
+               export DOWNLOADSDIR="/imagefs$DOWNLOADSDIR"; \
             fi \
          && for dir in $MAKEDIRS; \
             do \
