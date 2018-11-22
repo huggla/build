@@ -55,7 +55,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                   MAKEDIRS="$MAKEDIRS "; \
                fi; \
                MAKEDIRS=$MAKEDIRS$DOWNLOADSDIR; \
-               export DOWNLOADSDIR="/imagefs$DOWNLOADSDIR"; \
+               downloadsDir="/imagefs$DOWNLOADSDIR"; \
             fi \
          && for dir in $MAKEDIRS; \
             do \
@@ -86,7 +86,6 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && if [ -n "$DOWNLOADS" ]; \
             then \
                apk --virtual .downloaddeps add wget; \
-               downloadsDir=$DOWNLOADSDIR; \
                if [ -z "$downloadsDir" ]; \
                then \
                   downloadsDir="$(mktemp -d -p /buildfs/tmp)"; \
