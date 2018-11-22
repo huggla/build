@@ -48,6 +48,15 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && ln -s /var/cache/apk/* /buildfs/var/cache/apk/ \
          && apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /buildfs --virtual .rundeps add $RUNDEPS \
          && apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /buildfs --allow-untrusted --virtual .rundeps_untrusted add $RUNDEPS_UNTRUSTED \
+         && if [ -n "$DOWNLOADSDIR" ]; \
+            then \
+               if [ -n "$MAKEDIRS" ]; \
+               then \
+                  MAKEDIRS="$MAKEDIRS "; \
+               fi; \
+               MAKEDIRS=$MAKEDIRS$DOWNLOADSDIR; \
+               DOWNLOADSDIR="/imagefs$DOWNLOADSDIR"; \
+            fi \
          && for dir in $MAKEDIRS; \
             do \
                mkdir -p "$dir" "/buildfs$dir"; \
@@ -77,11 +86,9 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && if [ -n "$DOWNLOADS" ]; \
             then \
                apk --virtual .downloaddeps add wget; \
-               if [ -n "$DOWNLOADSDIR" ]; \
+               downloadsDir=$DOWNLOADSDIR; \
+               if [ -z "$downloadsDir" ]; \
                then \
-                  downloadsDir="/imagefs$DOWNLOADSDIR"; \
-                  mkdir -p "$downloadsDir"; \
-               else \
                   downloadsDir="$(mktemp -d -p /buildfs/tmp)"; \
                fi; \
                cd $downloadsDir; \
@@ -89,13 +96,13 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                do \
                   wget --no-check-certificate "$download"; \
                done; \
-               if [ -n "$DOWNLOADSDIR" ]; \
+               if [ -z "$DOWNLOADSDIR" ]; \
                then \
                   tar -xvp -f $downloadsDir/*.tar* -C $buildDir || true; \
                fi; \
                apk --purge del .downloaddeps; \
             fi \
-          && if [ -n "$BUILDCMDS" ]; \
+         && if [ -n "$BUILDCMDS" ]; \
             then \
                cd $buildDir; \
                eval "$BUILDCMDS || exit 1"; \
