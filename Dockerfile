@@ -85,7 +85,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && buildDir="$(mktemp -d -p /buildfs/tmp)" \
          && if [ -n "$DOWNLOADS" ]; \
             then \
-               apk --virtual .downloaddeps add wget; \
+               apk --virtual .downloaddeps add wget ca-certificates; \
                if [ -z "$downloadsDir" ]; \
                then \
                   downloadsDir="$(mktemp -d -p /buildfs/tmp)"; \
@@ -93,7 +93,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                cd $downloadsDir; \
                for download in $DOWNLOADS; \
                do \
-                  wget --no-check-certificate "$download"; \
+                  wget "$download"; \
                done; \
                if [ -z "$DOWNLOADSDIR" ]; \
                then \
