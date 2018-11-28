@@ -1,4 +1,4 @@
-ARG TAG="20181122"
+ARG TAG="20181128"
 
 FROM huggla/alpine-official:$TAG as image
 
@@ -26,7 +26,7 @@ ONBUILD ARG BUILDCMDS
 
 ONBUILD COPY --from=content1 ${CONTENTSOURCE1:-/} /buildfs${CONTENTDESTINATION1:-/}
 ONBUILD COPY --from=content2 ${CONTENTSOURCE2:-/} /buildfs${CONTENTDESTINATION2:-/}
-ONBUILD COPY --from=base /onbuild-exclude.filelist.gz /onbuild-exclude.filelist.gz
+ONBUILD COPY --from=init /onbuild-exclude.filelist.gz /onbuild-exclude.filelist.gz
 ONBUILD COPY ./ /tmp/
 
 ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
