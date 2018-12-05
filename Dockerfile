@@ -113,14 +113,14 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                do \
                   exe="/imagefs$exe"; \
                   exeDir="$(dirname "$exe")"; \
+                  exeName="$(basename "$exe")"; \
                   if [ "$exeDir" != "/imagefs/usr/local/bin" ]; \
                   then \
-                     exeName="$(basename "$exe")"; \
                      cp -a "$exe" "/imagefs/usr/local/bin/"; \
-                     chmod o= "/imagefs/usr/local/bin/$exeName"; \
                      cd "$exeDir"; \
                      ln -sf "$(relpath "$exeDir" "/imagefs/usr/local/bin")/$exeName" "$exeName"; \
                   fi; \
+                  chmod ug=rx,o= "/imagefs/usr/local/bin/$exeName"; \
                done; \
             fi \
          && if [ -n "$EXPOSEFUNCTIONS" ]; \
