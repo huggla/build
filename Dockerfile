@@ -51,7 +51,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                apk --root /excludefs add --initdb; \
                ln -s /var/cache/apk/* /excludefs/var/cache/apk/; \
                apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /excludefs add $EXCLUDEAPKS; \
-               apk --root /excludefs info -L $EXCLUDEAPKS | grep -v 'contains:$' | grep -v '^$' | awk '{print "/"$1}' | sort -u -o /onbuild-exclude.filelist /onbuild-exclude.filelist -; \
+               apk --root /excludefs info -L $EXCLUDEAPKS | grep -v 'contains:$' | grep -v '^$' | awk '{system("ls -la /"$1)}' | awk -F " " '{print $5" "$9}' | sort -u -o /onbuild-exclude.filelist /onbuild-exclude.filelist -; \
                rm -rf /excludefs; \
             fi \
          && apk --root /buildfs add --initdb \
