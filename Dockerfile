@@ -14,6 +14,7 @@ ONBUILD ARG DOWNLOADS
 ONBUILD ARG DOWNLOADSDIR
 ONBUILD ARG ADDREPOS
 ONBUILD ARG EXCLUDEAPKS
+ONBUILD ARG EXCLUDEDEPS
 ONBUILD ARG BUILDDEPS
 ONBUILD ARG BUILDDEPS_UNTRUSTED
 ONBUILD ARG RUNDEPS
@@ -45,13 +46,21 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                done; \
                rm -f /tmp/repo; \
             fi \
-         && if [ -n "$EXCLUDEAPKS" ]; \
+         && if [ -n "$EXCLUDEDEPS" ] || [ -n "$EXCLUDEAPKS" ]; \
             then \
                mkdir /excludefs; \
                apk --root /excludefs add --initdb; \
                ln -s /var/cache/apk/* /excludefs/var/cache/apk/; \
-               apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /excludefs add $EXCLUDEAPKS; \
-               apk --root /excludefs info -L $EXCLUDEAPKS | grep -v 'contains:$' | grep -v '^$' | awk '{system("ls -la /"$1)}' | awk -F " " '{print $5" "$9}' | sort -u -o /onbuild-exclude.filelist /onbuild-exclude.filelist -; \
+               if [ -n "$EXCLUDEDEPS" ]; \
+               then \
+                  apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /excludefs add $EXCLUDEDEPS; \
+                  apk --root /excludefs info -R $EXCLUDEDEPS | grep -v 'depends on:$' | grep -v '^$' | sort -u - | xargs apk info -L | grep -v 'contains:$' | grep -v '^$' | awk '{system("ls -la /"$1)}' | awk -F " " '{print $5" "$9}' | sort -u -o /onbuild-exclude.filelist /onbuild-exclude.filelist -; \
+               fi; \
+               if [ -n "$EXCLUDEAPKS" ]; \
+               then \
+                  apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /excludefs add $EXCLUDEAPKS; \
+                  apk --root /excludefs info -L $EXCLUDEAPKS | grep -v 'contains:$' | grep -v '^$' | awk '{system("ls -la /"$1)}' | awk -F " " '{print $5" "$9}' | sort -u -o /onbuild-exclude.filelist /onbuild-exclude.filelist -; \
+               fi; \
                rm -rf /excludefs; \
             fi \
          && apk --root /buildfs add --initdb \
