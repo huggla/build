@@ -13,6 +13,7 @@ ONBUILD ARG CONTENTDESTINATION2
 ONBUILD ARG DOWNLOADS
 ONBUILD ARG DOWNLOADSDIR
 ONBUILD ARG ADDREPOS
+ONBUILD ARG EXCLUDEAPKS
 ONBUILD ARG BUILDDEPS
 ONBUILD ARG BUILDDEPS_UNTRUSTED
 ONBUILD ARG RUNDEPS
@@ -43,6 +44,15 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                   echo $repo >> /etc/apk/repositories; \
                done; \
                rm -f /tmp/repo; \
+            fi \
+         && if [ -n "$EXCLUDEAPKS" ]; \
+            then \
+               mkdir /excludefs; \
+               apk --root /excludefs add --initdb; \
+               ln -s /var/cache/apk/* /excludefs/var/cache/apk/; \
+               apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /excludefs add $EXCLUDEAPKS; \
+               apk --root /excludefs info -L $EXCLUDEAPKS | grep -v 'contains:$' | grep -v '^$' | awk '{print "/"$1}' | sort -u -o /onbuild-exclude.filelist /onbuild-exclude.filelist -; \
+               rm -rf /excludefs; \
             fi \
          && apk --root /buildfs add --initdb \
          && ln -s /var/cache/apk/* /buildfs/var/cache/apk/ \
