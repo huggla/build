@@ -54,12 +54,12 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                if [ -n "$EXCLUDEDEPS" ]; \
                then \
                   apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /excludefs add $EXCLUDEDEPS; \
-                  apk --root /excludefs info -R $EXCLUDEDEPS | grep -v 'depends on:$' | grep -v '^$' | sort -u - | xargs apk info -L | grep -v 'contains:$' | grep -v '^$' | awk '{system("ls -la /"$1)}' | awk -F " " '{print $5" "$9}' | sort -u -o /onbuild-exclude.filelist /onbuild-exclude.filelist -; \
+                  apk --root /excludefs info -R $EXCLUDEDEPS | grep -v 'depends on:$' | grep -v '^$' | sort -u - | xargs apk info -L | grep -v 'contains:$' | grep -v '^$' | awk '{system("ls -la --full-time /"$1)}' | awk -F " " '{print $5" "$7" "$9}' | sort -u -o /onbuild-exclude.filelist /onbuild-exclude.filelist -; \
                fi; \
                if [ -n "$EXCLUDEAPKS" ]; \
                then \
                   apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /excludefs add $EXCLUDEAPKS; \
-                  apk --root /excludefs info -L $EXCLUDEAPKS | grep -v 'contains:$' | grep -v '^$' | awk '{system("ls -la /"$1)}' | awk -F " " '{print $5" "$9}' | sort -u -o /onbuild-exclude.filelist /onbuild-exclude.filelist -; \
+                  apk --root /excludefs info -L $EXCLUDEAPKS | grep -v 'contains:$' | grep -v '^$' | awk '{system("ls -la --full-time /"$1)}' | awk -F " " '{print $5" "$7" "$9}' | sort -u -o /onbuild-exclude.filelist /onbuild-exclude.filelist -; \
                fi; \
                rm -rf /excludefs; \
             fi \
@@ -89,7 +89,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && chmod ug=rx,o= /buildfs/usr/local/bin/* || true \
          && cd /buildfs \
          && find * -type d -exec mkdir -p /imagefs/{} + \
-         && find * ! -type d ! -type c -exec ls -la {} + | awk -F " " '{print $5" "$9}' | sort -u - > /onbuild-exclude.filelist.tmp \
+         && find * ! -type d ! -type c -exec ls -la --full-time {} + | awk -F " " '{print $5" "$7" "$9}' | sort -u - > /onbuild-exclude.filelist.tmp \
          && comm -13 /onbuild-exclude.filelist /onbuild-exclude.filelist.tmp | awk -F " " '{system("cp -a "$2" /imagefs/"$2)}' \
          && chmod 755 /imagefs /imagefs/lib /imagefs/usr /imagefs/usr/lib /imagefs/usr/local /imagefs/usr/local/bin || true \
          && chmod 700 /imagefs/bin /imagefs/sbin /imagefs/usr/bin /imagefs/usr/sbin || true \
