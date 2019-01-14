@@ -37,36 +37,34 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
             then \
                for repo in $ADDREPOS; \
                do \
-                  if [ "$repo" != "http://dl-cdn.alpinelinux.org/alpine/edge/testing" ] && [ "$repo" != "https://dl-cdn.alpinelinux.org/alpine/edge/testing" ]; \
-                  then \
-                     echo $repo > /tmp/repo; \
-                     apk --allow-untrusted --repositories-file /tmp/repo update; \
-                  fi; \
                   echo $repo >> /etc/apk/repositories; \
                done; \
-               rm -f /tmp/repo; \
             fi \
-         && if [ -n "$EXCLUDEDEPS" ] || [ -n "$EXCLUDEAPKS" ]; \
+         && if [ -n "$RUNDEPS" ]; \
             then \
-               mkdir /excludefs; \
-               apk --root /excludefs add --initdb; \
-               ln -s /var/cache/apk/* /excludefs/var/cache/apk/; \
-               if [ -n "$EXCLUDEDEPS" ]; \
+               apk update; \
+               if [ -n "$EXCLUDEDEPS" ] || [ -n "$EXCLUDEAPKS" ]; \
                then \
-                  apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /excludefs add $EXCLUDEDEPS; \
-                  apk --root /excludefs info -R $EXCLUDEDEPS | grep -v 'depends on:$' | grep -v '^$' | sort -u - | xargs apk info -L | grep -v 'contains:$' | grep -v '^$' | awk '{system("ls -la --full-time /"$1)}' | awk -F " " '{print $5" "$7" "$9}' | sort -u -o /onbuild-exclude.filelist /onbuild-exclude.filelist -; \
+                  mkdir /excludefs; \
+                  apk --root /excludefs add --initdb; \
+                  ln -s /var/cache/apk/* /excludefs/var/cache/apk/; \
+                  if [ -n "$EXCLUDEDEPS" ]; \
+                  then \
+                     apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /excludefs add $EXCLUDEDEPS; \
+                     apk --root /excludefs info -R $EXCLUDEDEPS | grep -v 'depends on:$' | grep -v '^$' | sort -u - | xargs apk info -L | grep -v 'contains:$' | grep -v '^$' | awk '{system("ls -la --full-time /"$1)}' | awk -F " " '{print $5" "$7" "$9}' | sort -u -o /onbuild-exclude.filelist /onbuild-exclude.filelist -; \
+                  fi; \
+                  if [ -n "$EXCLUDEAPKS" ]; \
+                  then \
+                     apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /excludefs add $EXCLUDEAPKS; \
+                     apk --root /excludefs info -L $EXCLUDEAPKS | grep -v 'contains:$' | grep -v '^$' | awk '{system("ls -la --full-time /"$1)}' | awk -F " " '{print $5" "$7" "$9}' | sort -u -o /onbuild-exclude.filelist /onbuild-exclude.filelist -; \
+                  fi; \
+                  rm -rf /excludefs; \
                fi; \
-               if [ -n "$EXCLUDEAPKS" ]; \
-               then \
-                  apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /excludefs add $EXCLUDEAPKS; \
-                  apk --root /excludefs info -L $EXCLUDEAPKS | grep -v 'contains:$' | grep -v '^$' | awk '{system("ls -la --full-time /"$1)}' | awk -F " " '{print $5" "$7" "$9}' | sort -u -o /onbuild-exclude.filelist /onbuild-exclude.filelist -; \
-               fi; \
-               rm -rf /excludefs; \
+               apk --root /buildfs add --initdb; \
+               ln -s /var/cache/apk/* /buildfs/var/cache/apk/; \
+               apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /buildfs --virtual .rundeps add $RUNDEPS; \
+               apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /buildfs --allow-untrusted --virtual .rundeps_untrusted add $RUNDEPS_UNTRUSTED; \
             fi \
-         && apk --root /buildfs add --initdb \
-         && ln -s /var/cache/apk/* /buildfs/var/cache/apk/ \
-         && apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /buildfs --virtual .rundeps add $RUNDEPS \
-         && apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /buildfs --allow-untrusted --virtual .rundeps_untrusted add $RUNDEPS_UNTRUSTED \
          && if [ -n "$DOWNLOADSDIR" ]; \
             then \
                if [ -n "$MAKEDIRS" ]; \
