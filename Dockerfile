@@ -1,6 +1,4 @@
-ARG TAG="20181204"
-
-FROM huggla/alpine-official:$TAG as image
+FROM huggla/alpine-official as image
 
 COPY ./rootfs /
 
