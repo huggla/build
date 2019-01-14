@@ -40,9 +40,10 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                   echo $repo >> /etc/apk/repositories; \
                done; \
             fi \
+         && apk update \
+         && apk upgrade \
          && if [ -n "$RUNDEPS" ]; \
             then \
-               apk update; \
                if [ -n "$EXCLUDEDEPS" ] || [ -n "$EXCLUDEAPKS" ]; \
                then \
                   mkdir /excludefs; \
