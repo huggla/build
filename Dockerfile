@@ -51,12 +51,12 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                   if [ -n "$EXCLUDEDEPS" ]; \
                   then \
                      apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /excludefs add $EXCLUDEDEPS; \
-                     apk --root /excludefs info -R $EXCLUDEDEPS | grep -v 'depends on:$' | grep -v '^$' | sort -u - | xargs apk info -L | grep -v 'contains:$' | grep -v '^$' | awk '{system("md5sum /"$1)}' | sort -u -o /onbuild-exclude.filelist /onbuild-exclude.filelist -; \
+                     apk --root /excludefs info -R $EXCLUDEDEPS | grep -v 'depends on:$' | grep -v '^$' | sort -u - | xargs apk info -L | grep -v 'contains:$' | grep -v '^$' | awk '{system("md5sum \"/"$0"\"")}' | awk '{first=$1; $1=""; print $0">"first}' | sed 's/^ //' | sort -u -o /onbuild-exclude.filelist /onbuild-exclude.filelist -; \
                   fi; \
                   if [ -n "$EXCLUDEAPKS" ]; \
                   then \
                      apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /excludefs add $EXCLUDEAPKS; \
-                     apk --root /excludefs info -L $EXCLUDEAPKS | grep -v 'contains:$' | grep -v '^$' | awk '{system("md5sum /"$1)}' | sort -u -o /onbuild-exclude.filelist /onbuild-exclude.filelist -; \
+                     apk --root /excludefs info -L $EXCLUDEAPKS | grep -v 'contains:$' | grep -v '^$' | awk '{system("md5sum \"/"$0"\"")}' | awk '{first=$1; $1=""; print $0">"first}' | sed 's/^ //' | sort -u -o /onbuild-exclude.filelist /onbuild-exclude.filelist -; \
                   fi; \
                   rm -rf /excludefs; \
                fi; \
