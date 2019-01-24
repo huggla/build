@@ -87,8 +87,8 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && chmod ug=rx,o= /buildfs/usr/local/bin/* || true \
          && cd /buildfs \
          && find * -type d -exec mkdir -p /imagefs/{} + \
-         && find * ! -type d ! -type c -type l -exec echo "{} $(readlink {})"\; | sort -u - > /onbuild-exclude.filelist.tmp \
-         && find * ! -type d ! -type c ! -type l -exec md5sum {} + | sort -u - >> /onbuild-exclude.filelist.tmp \
+         && find * ! -type d ! -type c -type l -exec echo -n "{} " \; -exec readlink "{}" \; > /onbuild-exclude.filelist.tmp \
+         && find * ! -type d ! -type c ! -type l -exec md5sum "{}" \; | awk '{first=$1; $1=""; print $0, first}' | sed 's/^ //' >> /onbuild-exclude.filelist.tmp \
          && comm -13 /onbuild-exclude.filelist /onbuild-exclude.filelist.tmp | awk -F " " '{system("cp -a "$2" /imagefs/"$2)}' \
          && chmod 755 /imagefs /imagefs/lib /imagefs/usr /imagefs/usr/lib /imagefs/usr/local /imagefs/usr/local/bin || true \
          && chmod 700 /imagefs/bin /imagefs/sbin /imagefs/usr/bin /imagefs/usr/sbin || true \
