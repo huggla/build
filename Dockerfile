@@ -154,7 +154,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                done; \
             fi \
          && rm -rf /imagefs/sys /imagefs/dev /imagefs/proc /tmp/* /imagefs/tmp/* /imagefs/lib/apk /imagefs/etc/apk /imagefs/var/cache/apk/* \
-         && ls -la /imagefs/sbin; \
+         && ls -la /imagefs/sbin \
          && for file in $REMOVEFILES; \
             do \
                rm -rf "/imagefs$file"; \
