@@ -146,7 +146,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                      cd "$exeDir"; \
                      ln -sf "$(relpath "$exeDir" "/imagefs/usr/local/bin")/$exeName" "$exeName"; \
                   fi; \
-                  if [ "$(stat -c %G "/imagefs/usr/local/bin/$exeName")" == "starter" ]; \
+                  if [ "$exeName" == "sudo" ]; \
                   then \
                      chmod ug=rx,o= "/imagefs/usr/local/bin/$exeName"; \
                   else \
