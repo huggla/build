@@ -93,7 +93,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                touch "/buildfs$file"; \
             done \
          && cp -a /tmp/rootfs/* /buildfs/ || true \
-         && find /buildfs/usr/local/bin/* ! -name sudo -exec chmod u=rx,go= "{}" + \
+         && chmod u=rx,go= /buildfs/usr/local/bin/* || true \
          && cd /buildfs \
          && find * -type d -exec mkdir -p /imagefs/{} + \
          && (find * ! -type d ! -type c -type l ! -path 'var/cache/*' ! -path 'tmp/*' -prune -exec echo -n "/{}>" \; -exec readlink "{}" \; && find * ! -type d ! -type c ! -type l ! -path 'var/cache/*' ! -path 'tmp/*' -prune -exec md5sum "{}" \; | awk '{first=$1; $1=""; print $0">"first}' | sed 's|^ |/|') | sort -u - > /onbuild-exclude.filelist.tmp \
