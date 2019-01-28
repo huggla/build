@@ -119,6 +119,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && cp -a /tmp/buildfs/* /buildfs/ || true \
          && apk --virtual .builddeps add $BUILDDEPS \
          && apk --allow-untrusted --virtual .builddeps_untrusted add $BUILDDEPS_UNTRUSTED \
+         && mkdir -p /buildfs/tmp \
          && buildDir="$(mktemp -d -p /buildfs/tmp)" \
          && if [ -n "$CLONEGITS" ]; \
             then \
@@ -134,7 +135,6 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                   git clone "$git"; \
                done; \
             fi \
-         && mkdir -p /buildfs/tmp \
          && if [ -n "$DOWNLOADS" ]; \
             then \
                if [ -z "$downloadsDir" ]; \
