@@ -126,7 +126,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                apk add git; \
                if [ -z "$cloneGitsDir" ]; \
                then \
-                  cloneGitsDir="$(mktemp -d -p /buildfs/tmp)"; \
+                  cloneGitsDir=$buildDir; \
                fi; \
                cd $cloneGitsDir; \
                for git in $CLONEGITS; \
@@ -139,7 +139,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
             then \
                if [ -z "$downloadsDir" ]; \
                then \
-                  downloadsDir="$(mktemp -d -p /buildfs/tmp)"; \
+                  downloadsDir=$buildDir; \
                fi; \
                cd $downloadsDir; \
                for download in $DOWNLOADS; \
