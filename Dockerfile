@@ -76,25 +76,14 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /buildfs --virtual .rundeps add $RUNDEPS; \
                apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /buildfs --allow-untrusted --virtual .rundeps_untrusted add $RUNDEPS_UNTRUSTED; \
             fi \
-         && if [ -n "$CLONEGITS" ]; \
+         && if [ -n "$CLONEGITSDIR" ]; \
             then \
-               if ! $(echo "$BUILDDEPS" | grep -qE '^(.* )?git( .*)?$'); \
+               if [ -n "$MAKEDIRS" ]; \
                then \
-                  if [ -n "$BUILDDEPS" ]; \
-                  then \
-                     BUILDDEPS="$BUILDDEPS "; \
-                  fi; \
-                  BUILDDEPS="${BUILDDEPS}git"
+                  MAKEDIRS="$MAKEDIRS "; \
                fi; \
-               if [ -n "$CLONEGITSDIR" ]; \
-               then \
-                  if [ -n "$MAKEDIRS" ]; \
-                  then \
-                     MAKEDIRS="$MAKEDIRS "; \
-                  fi; \
-                  MAKEDIRS="$MAKEDIRS$CLONEGITSDIR"; \
-                  cloneGitsDir="/imagefs$CLONEGITSDIR"; \
-               fi; \
+               MAKEDIRS="$MAKEDIRS$CLONEGITSDIR"; \
+               cloneGitsDir="/imagefs$CLONEGITSDIR"; \
             fi \
          && if [ -n "$DOWNLOADSDIR" ]; \
             then \
@@ -133,10 +122,19 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && buildDir="$(mktemp -d -p /buildfs/tmp)" \
          && if [ -n "$CLONEGITS" ]; \
             then \
-               git clone
+               apk add git; \
+               if [ -z "$cloneGitsDir" ]; \
+               then \
+                  cloneGitsDir="$(mktemp -d -p /buildfs/tmp)"; \
+               fi; \
+               cd $cloneGitsDir; \
+               for git in $CLONEGITS; \
+               do \
+                  git clone "$git"; \
+               done; \
+            fi \
          && if [ -n "$DOWNLOADS" ]; \
             then \
-               apk --virtual .downloaddeps add wget ca-certificates; \
                if [ -z "$downloadsDir" ]; \
                then \
                   downloadsDir="$(mktemp -d -p /buildfs/tmp)"; \
@@ -150,25 +148,6 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                then \
                   tar -xvp -f $downloadsDir/*.tar* -C $buildDir || true; \
                fi; \
-               apk --purge del .downloaddeps; \
-            fi \
-                     && if [ -n "$DOWNLOADS" ]; \
-            then \
-               apk --virtual .downloaddeps add wget ca-certificates; \
-               if [ -z "$downloadsDir" ]; \
-               then \
-                  downloadsDir="$(mktemp -d -p /buildfs/tmp)"; \
-               fi; \
-               cd $downloadsDir; \
-               for download in $DOWNLOADS; \
-               do \
-                  wget "$download"; \
-               done; \
-               if [ -z "$DOWNLOADSDIR" ]; \
-               then \
-                  tar -xvp -f $downloadsDir/*.tar* -C $buildDir || true; \
-               fi; \
-               apk --purge del .downloaddeps; \
             fi \
          && if [ -n "$BUILDCMDS" ]; \
             then \
