@@ -131,8 +131,8 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                cd $cloneGitsDir; \
                for git in "$CLONEGITS"; \
                do \
-                  eval "git=$git"; \
-                  git clone "$git"; \
+                  eval "git="$git; \
+                  git clone $git; \
                done; \
             fi \
          && if [ -n "$DOWNLOADS" ]; \
