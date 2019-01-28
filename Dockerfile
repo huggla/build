@@ -134,7 +134,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                   git clone "$git"; \
                done; \
             fi \
-         && mkdir -p /buildfs/tmp; \
+         && mkdir -p /buildfs/tmp \
          && if [ -n "$DOWNLOADS" ]; \
             then \
                if [ -z "$downloadsDir" ]; \
