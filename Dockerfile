@@ -12,6 +12,8 @@ ONBUILD ARG CONTENTSOURCE2
 ONBUILD ARG CONTENTSOURCE2="${CONTENTSOURCE2:-/}"
 ONBUILD ARG CONTENTDESTINATION2
 ONBUILD ARG CONTENTDESTINATION2="${CONTENTDESTINATION2:-/buildfs/}"
+ONBUILD ARG CLONEGITS
+ONBUILD ARG CLONEGITSDIR
 ONBUILD ARG DOWNLOADS
 ONBUILD ARG DOWNLOADSDIR
 ONBUILD ARG ADDREPOS
@@ -74,6 +76,26 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /buildfs --virtual .rundeps add $RUNDEPS; \
                apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /buildfs --allow-untrusted --virtual .rundeps_untrusted add $RUNDEPS_UNTRUSTED; \
             fi \
+         && if [ -n "$CLONEGITS" ]; \
+            then \
+               if ! $(echo "$BUILDDEPS" | grep -qE '^(.* )?git( .*)?$'); \
+               then \
+                  if [ -n "$BUILDDEPS" ]; \
+                  then \
+                     BUILDDEPS="$BUILDDEPS "; \
+                  fi; \
+                  BUILDDEPS="${BUILDDEPS}git"
+               fi; \
+               if [ -n "$CLONEGITSDIR" ]; \
+               then \
+                  if [ -n "$MAKEDIRS" ]; \
+                  then \
+                     MAKEDIRS="$MAKEDIRS "; \
+                  fi; \
+                  MAKEDIRS="$MAKEDIRS$CLONEGITSDIR"; \
+                  cloneGitsDir="/imagefs$CLONEGITSDIR"; \
+               fi; \
+            fi \
          && if [ -n "$DOWNLOADSDIR" ]; \
             then \
                if [ -n "$MAKEDIRS" ]; \
@@ -109,7 +131,28 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && apk --virtual .builddeps add $BUILDDEPS \
          && apk --allow-untrusted --virtual .builddeps_untrusted add $BUILDDEPS_UNTRUSTED \
          && buildDir="$(mktemp -d -p /buildfs/tmp)" \
+         && if [ -n "$CLONEGITS" ]; \
+            then \
+               git clone
          && if [ -n "$DOWNLOADS" ]; \
+            then \
+               apk --virtual .downloaddeps add wget ca-certificates; \
+               if [ -z "$downloadsDir" ]; \
+               then \
+                  downloadsDir="$(mktemp -d -p /buildfs/tmp)"; \
+               fi; \
+               cd $downloadsDir; \
+               for download in $DOWNLOADS; \
+               do \
+                  wget "$download"; \
+               done; \
+               if [ -z "$DOWNLOADSDIR" ]; \
+               then \
+                  tar -xvp -f $downloadsDir/*.tar* -C $buildDir || true; \
+               fi; \
+               apk --purge del .downloaddeps; \
+            fi \
+                     && if [ -n "$DOWNLOADS" ]; \
             then \
                apk --virtual .downloaddeps add wget ca-certificates; \
                if [ -z "$downloadsDir" ]; \
