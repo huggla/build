@@ -131,6 +131,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                cd $cloneGitsDir; \
                for git in "$CLONEGITS"; \
                do \
+               echo $git; \
                   git clone $git; \
                done; \
             fi \
