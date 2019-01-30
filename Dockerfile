@@ -27,6 +27,7 @@ ONBUILD ARG MAKEDIRS
 ONBUILD ARG MAKEFILES
 ONBUILD ARG REMOVEFILES
 ONBUILD ARG EXECUTABLES
+ONBUILD ARG STARTUPEXECUTABLES
 ONBUILD ARG EXPOSEFUNCTIONS
 ONBUILD ARG BUILDCMDS
 
@@ -157,8 +158,15 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                eval "$BUILDCMDS || exit 1"; \
             fi \
          && rm -rf /buildfs \
-         && if [ -n "$EXECUTABLES" ]; \
+         && if [ -n "$EXECUTABLES" ] || [ -n "$STARTUPEXECUTABLES" ]; \
             then \
+               if [ -n "$EXECUTABLES" ] && [ -n "$STARTUPEXECUTABLES" ]; \
+               then \
+                  EXECUTABLES="$EXECUTABLES $STARTUPEXECUTABLES"; \
+               elif [ -z "$EXECUTABLES" ]; \
+               then \
+                  EXECUTABLES="$STARTUPEXECUTABLES"; \
+               fi; \
                for exe in $EXECUTABLES; \
                do \
                   exe="/imagefs$exe"; \
