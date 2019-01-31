@@ -37,6 +37,9 @@ ONBUILD COPY --from=init /onbuild-exclude.filelist.gz /onbuild-exclude.filelist.
 ONBUILD COPY ./ /tmp/
 
 ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
+         && chmod -R g-w,o= "$CONTENTDESTINATION1" "$CONTENTDESTINATION2" \
+         && find "$CONTENTDESTINATION1" -type f -perm +010 -exec chmod g-x "{}" \
+         && find "$CONTENTDESTINATION2" -type f -perm +010 -exec chmod g-x "{}" \
          && mkdir -p /imagefs /buildfs/usr/local/bin \
          && chmod -R o= /imagefs /buildfs \
          && if [ -n "$ADDREPOS" ]; \
