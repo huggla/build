@@ -204,7 +204,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
             for dir in $REMOVEDIRS; \
             do \
                find "/imagefs$dir" -type d -maxdepth 0 -exec rm -rf "{}" +; \
-            done \
+            done; \
             for file in $REMOVEFILES; \
             do \
                find "/imagefs$file" -type f -maxdepth 0 -exec rm -f "{}" +; \
