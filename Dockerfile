@@ -25,6 +25,7 @@ ONBUILD ARG RUNDEPS
 ONBUILD ARG RUNDEPS_UNTRUSTED
 ONBUILD ARG MAKEDIRS
 ONBUILD ARG MAKEFILES
+ONBUILD ARG REMOVEDIRS
 ONBUILD ARG REMOVEFILES
 ONBUILD ARG EXECUTABLES
 ONBUILD ARG STARTUPEXECUTABLES
@@ -200,8 +201,12 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && rm -rf /imagefs/sys /imagefs/dev /imagefs/proc /tmp/* /imagefs/lib/apk /imagefs/etc/apk \
          && find /imagefs/var/cache ! -type d ! -type c -delete; \
             find /imagefs/tmp ! -type d ! -type c -delete; \
+            for dir in $REMOVEDIRS; \
+            do \
+               find "/imagefs$dir" -type d -maxdepth 0 -exec rm -rf "{}" +; \
+            done \
             for file in $REMOVEFILES; \
             do \
-               rm -rf "/imagefs"$file; \
+               find "/imagefs$file" -type f -maxdepth 0 -exec rm -f "{}" +; \
             done \
          && apk --purge del .builddeps .builddeps_untrusted
