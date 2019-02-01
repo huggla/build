@@ -114,7 +114,6 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && chmod 755 /imagefs /imagefs/lib /imagefs/usr /imagefs/usr/lib /imagefs/usr/local /imagefs/usr/local/bin || true \
          && chmod 700 /imagefs/bin /imagefs/sbin /imagefs/usr/bin /imagefs/usr/sbin || true \
          && chmod 750 /imagefs/etc /imagefs/var /imagefs/run /imagefs/var/cache /imagefs/start /imagefs/stop || true \
-         && chmod 770 /imagefs/tmp || true \
          && cat /onbuild-exclude.filelist /onbuild-exclude.filelist.tmp | sort -u - | gzip -9 > /imagefs/onbuild-exclude.filelist.gz \
          && chmod go= /imagefs/onbuild-exclude.filelist.gz \
          && apk add --initdb \
@@ -201,6 +200,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && rm -rf /imagefs/sys /imagefs/dev /imagefs/proc /tmp/* /imagefs/lib/apk /imagefs/etc/apk \
          && find /imagefs/var/cache ! -type d ! -type c -delete; \
             find /imagefs/tmp ! -type d ! -type c -delete; \
+            chmod -R 770 /imagefs/tmp; \
             for dir in $REMOVEDIRS; \
             do \
                find "/imagefs$dir" -type d -maxdepth 0 -exec rm -rf "{}" +; \
