@@ -201,11 +201,11 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && find /imagefs/var/cache ! -type d ! -type c -delete; \
             find /imagefs/tmp ! -type d ! -type c -delete; \
             chmod -R 770 /imagefs/tmp; \
-            for dir in $REMOVEDIRS; \
+            for dir in "$REMOVEDIRS"; \
             do \
                find "/imagefs$(dirname $dir)" -name "$(basename $dir)" -type d -maxdepth 1 -exec rm -rf "{}" +; \
             done; \
-            for file in $REMOVEFILES; \
+            for file in "$REMOVEFILES"; \
             do \
                find "/imagefs$(dirname $file)" -name "$(basename $file)" -type f -maxdepth 1 -exec rm -f "{}" +; \
             done \
