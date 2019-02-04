@@ -204,10 +204,13 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
             set -f; \
             for dir in $REMOVEDIRS; \
             do \
+               set +f; \
                find "/imagefs$(dirname "$dir")" -name "$(basename "$dir")" -type d -maxdepth 1 -exec rm -rf "{}" +; \
             done; \
+            set -f; \
             for file in $REMOVEFILES; \
             do \
+               set +f; \
            #    parentDir="/imagefs""$(dirname $file)"; \
            echo "$file"; \
            echo "/imagefs$(dirname "$file")"; \
