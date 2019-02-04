@@ -203,11 +203,11 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
             chmod -R 770 /imagefs/tmp; \
             for dir in $REMOVEDIRS; \
             do \
-               find "/imagefs$(dirname $dir)" -name "$(basename $dir)" -type d -maxdepth 1 -exec rm -rf "{}" +; \
+               find "/imagefs$(dirname "$dir")" -name "$(basename "$dir")" -type d -maxdepth 1 -exec rm -rf "{}" +; \
             done; \
             for file in $REMOVEFILES; \
             do \
-               parentDir="/imagefs""$(dirname $file)"; \
-               find $parentDir -name "$(basename $file)" -type f -maxdepth 1 -exec rm -f "{}" +; \
+           #    parentDir="/imagefs""$(dirname $file)"; \
+               find "/imagefs$(dirname "$file")" -name "$(basename "$file")" -type f -maxdepth 1 -exec rm -f "{}" +; \
             done \
          && apk --purge del .builddeps .builddeps_untrusted
