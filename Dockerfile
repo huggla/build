@@ -201,16 +201,20 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && find /imagefs/var/cache ! -type d ! -type c -delete; \
             find /imagefs/tmp ! -type d ! -type c -delete; \
             chmod -R 770 /imagefs/tmp; \
+            echo "$REMOVEDIRS"; \
             for dir in $REMOVEDIRS; \
             do \
+                        echo "$dir"; \
+            echo "/imagefs$(dirname $dir)"; \
+            echo "$(basename $dir)"; \
                find "/imagefs$(dirname $dir)" -name "$(basename $dir)" -type d -maxdepth 0 -exec rm -rf "{}" +; \
             done; \
-            echo "$REMOVEFILES"
+            echo "$REMOVEFILES"; \
             for file in $REMOVEFILES; \
             do \
-            echo "$file"
-            echo "/imagefs$(dirname $file)"
-            echo "$(basename $file)"
+            echo "$file"; \
+            echo "/imagefs$(dirname $file)"; \
+            echo "$(basename $file)"; \
                find "/imagefs$(dirname $file)" -name "$(basename $file)" -type f -maxdepth 0 -exec rm -f "{}" +; \
             done \
          && apk --purge del .builddeps .builddeps_untrusted
