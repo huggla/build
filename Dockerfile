@@ -205,8 +205,12 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
             do \
                find "/imagefs$(dirname $dir)" -name "$(basename $dir)" -type d -maxdepth 0 -exec rm -rf "{}" +; \
             done; \
+            echo "$REMOVEFILES"
             for file in $REMOVEFILES; \
             do \
+            echo "$file"
+            echo "/imagefs$(dirname $file)"
+            echo "$(basename $file)"
                find "/imagefs$(dirname $file)" -name "$(basename $file)" -type f -maxdepth 0 -exec rm -f "{}" +; \
             done \
          && apk --purge del .builddeps .builddeps_untrusted
