@@ -108,7 +108,7 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && find "$CONTENTDESTINATION2" -type f -perm +010 -exec chmod g-x "{}" + \
          && chmod u=rx,go= /buildfs/usr/local/bin/* || true \
          && cd /buildfs \
-         && find * -type d -exec mkdir -p "/imagefs/{}" + \
+         && find * -type d -exec mkdir -m 750 "/imagefs/{}" + \
          && (find * ! -type d ! -type c -type l ! -path 'var/cache/*' ! -path 'tmp/*' -prune -exec echo -n "/{}>" \; -exec readlink "{}" \; && find * ! -type d ! -type c ! -type l ! -path 'var/cache/*' ! -path 'tmp/*' -prune -exec md5sum "{}" \; | awk '{first=$1; $1=""; print $0">"first}' | sed 's|^ |/|') | sort -u - > /onbuild-exclude.filelist.tmp \
          && comm -13 /onbuild-exclude.filelist /onbuild-exclude.filelist.tmp | awk -F '>' '{system("cp -a \"."$1"\" \"/imagefs/"$1"\"")}' \
          && chmod 755 /imagefs /imagefs/lib /imagefs/usr /imagefs/usr/lib /imagefs/usr/local /imagefs/usr/local/bin || true \
