@@ -39,10 +39,6 @@ ONBUILD COPY ./ /tmp/
 
 ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && mkdir -p /imagefs /buildfs/usr/local/bin \
-         && chmod -R o= /imagefs /buildfs \
-         && chmod -R g-w,o= "$CONTENTDESTINATION1" "$CONTENTDESTINATION2" \
-         && find "$CONTENTDESTINATION1" -type f -perm +010 -exec chmod g-x "{}" + \
-         && find "$CONTENTDESTINATION2" -type f -perm +010 -exec chmod g-x "{}" + \
          && if [ -n "$ADDREPOS" ]; \
             then \
                for repo in $ADDREPOS; \
@@ -106,6 +102,10 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                touch "/buildfs$file"; \
             done \
          && cp -a /tmp/rootfs/* /buildfs/ || true \
+         && chmod -R o= /imagefs /buildfs \
+         && chmod -R g-w,o= "$CONTENTDESTINATION1" "$CONTENTDESTINATION2" \
+         && find "$CONTENTDESTINATION1" -type f -perm +010 -exec chmod g-x "{}" + \
+         && find "$CONTENTDESTINATION2" -type f -perm +010 -exec chmod g-x "{}" + \
          && chmod u=rx,go= /buildfs/usr/local/bin/* || true \
          && cd /buildfs \
          && find * -type d -exec mkdir -p "/imagefs/{}" + \
