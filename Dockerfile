@@ -34,10 +34,10 @@ ONBUILD ARG BUILDCMDS
 
 ONBUILD COPY --from=content1 "$CONTENTSOURCE1" "$CONTENTDESTINATION1"
 ONBUILD COPY --from=content2 "$CONTENTSOURCE2" "$CONTENTDESTINATION2"
-ONBUILD COPY --from=init /onbuild-exclude.filelist.gz /onbuild-exclude.filelist.gz
+ONBUILD COPY --from=init /buildInit /buildInit
 ONBUILD COPY ./ /tmp/
 
-ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
+ONBUILD RUN gunzip /buildInit/onbuild-exclude.filelist.gz \
          && mkdir -p /imagefs /buildfs/usr/local/bin \
          && if [ -n "$ADDREPOS" ]; \
             then \
@@ -59,12 +59,12 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                   if [ -n "$EXCLUDEDEPS" ]; \
                   then \
                      apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /excludefs add $EXCLUDEDEPS; \
-                     apk --root /excludefs info -R $EXCLUDEDEPS | grep -v 'depends on:$' | grep -v '^$' | sort -u - | xargs apk --root /excludefs info -L | grep -v 'contains:$' | grep -v '^$' | awk '{system("md5sum \""$0"\"")}' | awk '{first=$1; $1=""; print $0">"first}' | sed 's|^ |/|' | sort -u -o /onbuild-exclude.filelist /onbuild-exclude.filelist -; \
+                     apk --root /excludefs info -R $EXCLUDEDEPS | grep -v 'depends on:$' | grep -v '^$' | sort -u - | xargs apk --root /excludefs info -L | grep -v 'contains:$' | grep -v '^$' | awk '{system("md5sum \""$0"\"")}' | awk '{first=$1; $1=""; print $0">"first}' | sed 's|^ |/|' | sort -u -o /buildInit/onbuild-exclude.filelist /buildInit/onbuild-exclude.filelist -; \
                   fi; \
                   if [ -n "$EXCLUDEAPKS" ]; \
                   then \
                      apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /excludefs add $EXCLUDEAPKS; \
-                     apk --root /excludefs info -L $EXCLUDEAPKS | grep -v 'contains:$' | grep -v '^$' | awk '{system("md5sum \""$0"\"")}' | awk '{first=$1; $1=""; print $0">"first}' | sed 's|^ |/|' | sort -u -o /onbuild-exclude.filelist /onbuild-exclude.filelist -; \
+                     apk --root /excludefs info -L $EXCLUDEAPKS | grep -v 'contains:$' | grep -v '^$' | awk '{system("md5sum \""$0"\"")}' | awk '{first=$1; $1=""; print $0">"first}' | sed 's|^ |/|' | sort -u -o /buildInit/onbuild-exclude.filelist /buildInit/onbuild-exclude.filelist -; \
                   fi; \
                   cd /; \
                   rm -rf /excludefs; \
@@ -74,6 +74,11 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
                apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /buildfs --virtual .rundeps add $RUNDEPS; \
                apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /buildfs --allow-untrusted --virtual .rundeps_untrusted add $RUNDEPS_UNTRUSTED; \
             fi \
+         && if [ -n "$STARTUPEXECUTABLES" ]; \
+            then \
+               for exe in $STARTUPEXECUTABLES; \
+               do \
+                  echo "$exe" >> /buildfs/
          && if [ -n "$CLONEGITSDIR" ]; \
             then \
                if [ -n "$MAKEDIRS" ]; \
@@ -109,13 +114,13 @@ ONBUILD RUN gunzip /onbuild-exclude.filelist.gz \
          && chmod u=rx,go= /buildfs/usr/local/bin/* || true \
          && cd /buildfs \
          && find * -type d -exec mkdir -m 750 "/imagefs/{}" + \
-         && (find * ! -type d ! -type c -type l ! -path 'var/cache/*' ! -path 'tmp/*' -prune -exec echo -n "/{}>" \; -exec readlink "{}" \; && find * ! -type d ! -type c ! -type l ! -path 'var/cache/*' ! -path 'tmp/*' -prune -exec md5sum "{}" \; | awk '{first=$1; $1=""; print $0">"first}' | sed 's|^ |/|') | sort -u - > /onbuild-exclude.filelist.tmp \
+         && (find * ! -type d ! -type c -type l ! -path 'var/cache/*' ! -path 'tmp/*' -prune -exec echo -n "/{}>" \; -exec readlink "{}" \; && find * ! -type d ! -type c ! -type l ! -path 'var/cache/*' ! -path 'tmp/*' -prune -exec md5sum "{}" \; | awk '{first=$1; $1=""; print $0">"first}' | sed 's|^ |/|') | sort -u - > /buildInit/onbuild-exclude.filelist.tmp \
          && comm -13 /onbuild-exclude.filelist /onbuild-exclude.filelist.tmp | awk -F '>' '{system("cp -a \"."$1"\" \"/imagefs/"$1"\"")}' \
          && chmod 755 /imagefs /imagefs/lib /imagefs/usr /imagefs/usr/lib /imagefs/usr/local /imagefs/usr/local/bin || true \
          && chmod 700 /imagefs/bin /imagefs/sbin /imagefs/usr/bin /imagefs/usr/sbin || true \
          && chmod 750 /imagefs/etc /imagefs/var /imagefs/run /imagefs/var/cache /imagefs/start /imagefs/stop || true \
-         && cat /onbuild-exclude.filelist /onbuild-exclude.filelist.tmp | sort -u - | gzip -9 > /imagefs/onbuild-exclude.filelist.gz \
-         && chmod go= /imagefs/onbuild-exclude.filelist.gz \
+         && cat /buildInit/onbuild-exclude.filelist /buildInit/onbuild-exclude.filelist.tmp | sort -u - | gzip -9 > /imagefs/buildInit/onbuild-exclude.filelist.gz \
+         && chmod go= /imagefs/buildInit/onbuild-exclude.filelist.gz \
          && apk add --initdb \
          && cp -a /tmp/buildfs/* /buildfs/ || true \
          && apk --virtual .builddeps add $BUILDDEPS \
