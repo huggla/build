@@ -220,6 +220,6 @@ ONBUILD RUN gunzip /environment/onbuild.gz \
                   echo "$exe" >> /environment/startupexecutables; \
                done; \
             fi \
-         && gzip -9 /environment/onbuild \
+         && gzip -9 -r /environment/onbuild \
          && mv /environment /imagefs/ \
          && apk --purge del .builddeps .builddeps_untrusted
