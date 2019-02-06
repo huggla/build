@@ -37,7 +37,7 @@ ONBUILD COPY --from=content2 "$CONTENTSOURCE2" "$CONTENTDESTINATION2"
 ONBUILD COPY --from=init /environment /environment
 ONBUILD COPY ./ /tmp/
 
-ONBUILD RUN gunzip /environment/onbuild.gz \
+ONBUILD RUN tar -x -f /environment/onbuild.tar.gz -C /environment \
          && mkdir -p /imagefs /buildfs/usr/local/bin \
          && if [ -n "$ADDREPOS" ]; \
             then \
@@ -220,6 +220,6 @@ ONBUILD RUN gunzip /environment/onbuild.gz \
                   echo "$exe" >> /environment/startupexecutables; \
                done; \
             fi \
-         && gzip -9 -r /environment/onbuild \
+         && tar -c -z -f /environment/onbuild.tar.gz -C /environment onbuild \
          && mv /environment /imagefs/ \
          && apk --purge del .builddeps .builddeps_untrusted
