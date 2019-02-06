@@ -64,7 +64,7 @@ ONBUILD RUN tar -x -f /environment/onbuild.tar.gz -C /environment \
                   if [ -n "$EXCLUDEAPKS" ]; \
                   then \
                      apk --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --root /excludefs add $EXCLUDEAPKS; \
-                     apk --root /excludefs info -L $EXCLUDEAPKS | grep -v 'contains:$' | grep -v '^$' | awk '{system("md5sum \""$0"\"")}' | awk '{first=$1; $1=""; print $0">"first}' | sed 's|^ |/|' | sort -u -o /onbuild/exclude.filelist /onbuild/exclude.filelist -; \
+                     apk --root /excludefs info -L $EXCLUDEAPKS | grep -v 'contains:$' | grep -v '^$' | awk '{system("md5sum \""$0"\"")}' | awk '{first=$1; $1=""; print $0">"first}' | sed 's|^ |/|' | sort -u -o /environment/onbuild/exclude.filelist /environment/onbuild/exclude.filelist -; \
                   fi; \
                   cd /; \
                   rm -rf /excludefs; \
