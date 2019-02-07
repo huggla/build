@@ -197,7 +197,7 @@ ONBUILD RUN tar -x -f /environment/onbuild.tar.gz -C /environment \
                   ln -s ../../../../start/functions/$func ./; \
                done; \
             fi \
-         && rm -rf /imagefs/sys /imagefs/dev /imagefs/proc /tmp/* /imagefs/lib/apk /imagefs/etc/apk \
+         && rm -rf /imagefs/sys /imagefs/dev /imagefs/proc /imagefs/lib/apk /imagefs/etc/apk \
          && find /imagefs/var/cache ! -type d ! -type c -delete; \
             find /imagefs/tmp ! -type d ! -type c -delete; \
             chmod -R 770 /imagefs/tmp; \
