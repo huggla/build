@@ -37,7 +37,8 @@ ONBUILD COPY --from=content2 "$CONTENTSOURCE2" "$CONTENTDESTINATION2"
 ONBUILD COPY --from=init /environment /environment
 ONBUILD COPY ./ /tmp/
 
-ONBUILD RUN tar -x -f /environment/onbuild.tar.gz -C /environment \
+ONBUILD RUN ls -la / \
+&& tar -x -f /environment/onbuild.tar.gz -C /environment \
          && mkdir -p /imagefs /buildfs/usr/local/bin /tmp/onbuild \
          && if [ -n "$ADDREPOS" ]; \
             then \
@@ -221,5 +222,8 @@ ONBUILD RUN tar -x -f /environment/onbuild.tar.gz -C /environment \
                done; \
             fi \
          && tar -c -z -f /environment/onbuild.tar.gz -C /tmp onbuild \
+         && ls -la / \
+         && ls -la /imagefs/ \
          && mv /environment /imagefs/ \
-         && apk --purge del .builddeps .builddeps_untrusted
+         && apk --purge del .builddeps .builddeps_untrusted \
+         && ls -la /imagefs/
