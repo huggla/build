@@ -40,6 +40,8 @@ ONBUILD COPY ./ /tmp/
 ONBUILD RUN chmod go= /environment \
          && tar -x -f /environment/onbuild.tar.gz -C /tmp \
          && mkdir -p /imagefs/tmp /imagefs/run /imagefs/var /buildfs/usr/local/bin \
+         && chmod 750 /imagefs/var /imagefs/run \
+         && chmod 770 /imagefs/tmp \
          && cd /imagefs/var \
          && ln -s ../tmp tmp \
          && ln -s ../run run \
