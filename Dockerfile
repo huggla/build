@@ -25,6 +25,8 @@ ONBUILD ARG RUNDEPS
 ONBUILD ARG RUNDEPS_UNTRUSTED
 ONBUILD ARG MAKEDIRS
 ONBUILD ARG MAKEFILES
+ONBUILD ARG GID0WRITABLESRECURSIVE
+ONBUILD ARG GID0WRITABLES
 ONBUILD ARG REMOVEDIRS
 ONBUILD ARG REMOVEFILES
 ONBUILD ARG EXECUTABLES
@@ -218,13 +220,22 @@ ONBUILD RUN chmod go= /environment \
                set +f; \
                find "/imagefs$(dirname "$file")" -name "$(basename "$file")" -type f -maxdepth 1 -exec rm -f "{}" +; \
             done \
-         && if [ -n "$STARTUPEXECUTABLES" ]; \
-            then \
-               for exe in $STARTUPEXECUTABLES; \
-               do \
-                  echo "$exe" >> /environment/startupexecutables; \
-               done; \
-            fi \
+         && for exe in $STARTUPEXECUTABLES; \
+            do \
+               echo "$exe" >> /environment/startupexecutables; \
+            done \
+            set -f; \
+         && for file in $GID0WRITABLES; \
+            do \
+               set +f; \
+               find "/imagefs$(dirname "$file")" -name "$(basename "$file")" -maxdepth 1 -exec chmod g+w "{}" +; \
+            done \
+            set -f; \
+         && for file in $GID0WRITABLESRECURSIVE; \
+            do \
+               set +f; \
+               find "/imagefs$(dirname "$file")" -name "$(basename "$file")" -maxdepth 1 -exec chmod -R g+w "{}" +; \
+            done \
          && tar -c -z -f /environment/onbuild.tar.gz -C /tmp onbuild \
          && mv /environment /imagefs/ \
          && apk --purge del .builddeps .builddeps_untrusted
