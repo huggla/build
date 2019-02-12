@@ -43,6 +43,7 @@ ONBUILD RUN chmod go= /environment \
          && cd /buildfs/var \
          && ln -s ../tmp tmp \
          && ln -s ../run run \
+         && cp -a /buildfs/tmp /buildfs/run /buildfs/var /imagefs/ \
          && if [ -n "$ADDREPOS" ]; \
             then \
                for repo in $ADDREPOS; \
