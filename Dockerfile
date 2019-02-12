@@ -39,7 +39,10 @@ ONBUILD COPY ./ /tmp/
 
 ONBUILD RUN chmod go= /environment \
          && tar -x -f /environment/onbuild.tar.gz -C /tmp \
-         && mkdir -p /imagefs /buildfs/usr/local/bin \
+         && mkdir -p /imagefs/tmp /imagefs/run /imagefs/var /buildfs/usr/local/bin \
+         && cd /imagefs/var \
+         && ln -s ../tmp tmp \
+         && ln -s ../run run \
          && if [ -n "$ADDREPOS" ]; \
             then \
                for repo in $ADDREPOS; \
