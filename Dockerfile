@@ -39,10 +39,8 @@ ONBUILD COPY ./ /tmp/
 
 ONBUILD RUN chmod go= /environment \
          && tar -x -f /environment/onbuild.tar.gz -C /tmp \
-         && mkdir -p /imagefs/tmp /imagefs/run /imagefs/var /buildfs/usr/local/bin \
-         && chmod 750 /imagefs/var /imagefs/run \
-         && chmod 770 /imagefs/tmp \
-         && cd /imagefs/var \
+         && mkdir -p /imagefs /buildfs/tmp /buildfs/run /buildfs/var /buildfs/usr/local/bin \
+         && cd /buildfs/var \
          && ln -s ../tmp tmp \
          && ln -s ../run run \
          && if [ -n "$ADDREPOS" ]; \
@@ -114,7 +112,7 @@ ONBUILD RUN chmod go= /environment \
          && find "$CONTENTDESTINATION2" -type f -perm +010 -exec chmod g-x "{}" + \
          && chmod u=rx,go= /buildfs/usr/local/bin/* || true \
          && cd /buildfs \
-         && find * -type d ! -path 'var/tmp' ! -path 'var/run' -exec mkdir -m 750 "/imagefs/{}" + \
+         && find * -type d ! -path 'tmp' ! -path 'var' ! -path 'run' ! -path 'var/tmp' ! -path 'var/run' -exec mkdir -m 750 "/imagefs/{}" + \
          && (find * ! -type d ! -type c -type l ! -path 'var/cache/*' ! -path 'tmp/*' -prune -exec echo -n "/{}>" \; -exec readlink "{}" \; && find * ! -type d ! -type c ! -type l ! -path 'var/cache/*' ! -path 'tmp/*' -prune -exec md5sum "{}" \; | awk '{first=$1; $1=""; print $0">"first}' | sed 's|^ |/|') | sort -u - > /tmp/onbuild/exclude.filelist.new \
          && comm -13 /tmp/onbuild/exclude.filelist /tmp/onbuild/exclude.filelist.new | awk -F '>' '{system("cp -a \"."$1"\" \"/imagefs/"$1"\"")}' \
          && chmod 755 /imagefs /imagefs/lib /imagefs/usr /imagefs/usr/lib /imagefs/usr/local /imagefs/usr/local/bin || true \
