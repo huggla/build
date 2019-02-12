@@ -32,6 +32,13 @@ ONBUILD ARG STARTUPEXECUTABLES
 ONBUILD ARG EXPOSEFUNCTIONS
 ONBUILD ARG BUILDCMDS
 
+ONBUILD RUN mkdir -p /imagefs /buildfs/tmp /buildfs/run /buildfs/var /buildfs/usr/local/bin \
+         && chmod 770 /buildfs/tmp \
+         && cd /buildfs/var \
+         && ln -s ../tmp tmp \
+         && ln -s ../run run \
+         && cp -a /buildfs/tmp /buildfs/run /buildfs/var /imagefs/
+
 ONBUILD COPY --from=content1 "$CONTENTSOURCE1" "$CONTENTDESTINATION1"
 ONBUILD COPY --from=content2 "$CONTENTSOURCE2" "$CONTENTDESTINATION2"
 ONBUILD COPY --from=init /environment /environment
@@ -39,11 +46,6 @@ ONBUILD COPY ./ /tmp/
 
 ONBUILD RUN chmod go= /environment \
          && tar -x -f /environment/onbuild.tar.gz -C /tmp \
-         && mkdir -p /imagefs /buildfs/tmp /buildfs/run /buildfs/var /buildfs/usr/local/bin \
-         && cd /buildfs/var \
-         && ln -s ../tmp tmp \
-         && ln -s ../run run \
-         && cp -a /buildfs/tmp /buildfs/run /buildfs/var /imagefs/ \
          && if [ -n "$ADDREPOS" ]; \
             then \
                for repo in $ADDREPOS; \
@@ -125,7 +127,6 @@ ONBUILD RUN chmod go= /environment \
          && cp -a /tmp/buildfs/* /buildfs/ || true \
          && apk --virtual .builddeps add $BUILDDEPS \
          && apk --allow-untrusted --virtual .builddeps_untrusted add $BUILDDEPS_UNTRUSTED \
-         && mkdir -p /buildfs/tmp \
          && buildDir="$(mktemp -d -p /buildfs/tmp)" \
          && if [ -n "$CLONEGITS" ]; \
             then \
@@ -205,7 +206,6 @@ ONBUILD RUN chmod go= /environment \
          && rm -rf /imagefs/sys /imagefs/dev /imagefs/proc /imagefs/lib/apk /imagefs/etc/apk \
          && find /imagefs/var/cache ! -type d ! -type c -delete; \
             find /imagefs/tmp ! -type d ! -type c -delete; \
-            chmod -R 770 /imagefs/tmp; \
             set -f; \
             for dir in $REMOVEDIRS; \
             do \
