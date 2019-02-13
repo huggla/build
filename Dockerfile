@@ -207,15 +207,15 @@ ONBUILD RUN chmod go= /environment \
             fi \
          && rm -rf /imagefs/sys /imagefs/dev /imagefs/proc /imagefs/lib/apk /imagefs/etc/apk \
          && find /imagefs/var/cache ! -type d ! -type c -delete; \
-            find /imagefs/tmp ! -type d ! -type c -delete; \
-            set -f; \
-            for dir in $REMOVEDIRS; \
+            find /imagefs/tmp ! -type d ! -type c -delete \
+         && set -f \
+         && for dir in $REMOVEDIRS; \
             do \
                set +f; \
                find "/imagefs$(dirname "$dir")" -name "$(basename "$dir")" -type d -maxdepth 1 -exec rm -rf "{}" +; \
-            done; \
-            set -f; \
-            for file in $REMOVEFILES; \
+            done \
+         && set -f \
+         && for file in $REMOVEFILES; \
             do \
                set +f; \
                find "/imagefs$(dirname "$file")" -name "$(basename "$file")" ! -type d ! -type c -maxdepth 1 -exec rm -f "{}" +; \
@@ -224,13 +224,13 @@ ONBUILD RUN chmod go= /environment \
             do \
                echo "$exe" >> /environment/startupexecutables; \
             done \
-            set -f; \
+         && set -f \
          && for file in $GID0WRITABLES; \
             do \
                set +f; \
                find "/imagefs$(dirname "$file")" -name "$(basename "$file")" -maxdepth 1 -exec chmod g+w "{}" +; \
             done \
-            set -f; \
+         && set -f \
          && for file in $GID0WRITABLESRECURSIVE; \
             do \
                set +f; \
