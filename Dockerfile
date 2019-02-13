@@ -218,7 +218,7 @@ ONBUILD RUN chmod go= /environment \
             for file in $REMOVEFILES; \
             do \
                set +f; \
-               find "/imagefs$(dirname "$file")" -name "$(basename "$file")" -type f -maxdepth 1 -exec rm -f "{}" +; \
+               find "/imagefs$(dirname "$file")" -name "$(basename "$file")" ! -type d ! -type c -maxdepth 1 -exec rm -f "{}" +; \
             done \
          && for exe in $STARTUPEXECUTABLES; \
             do \
