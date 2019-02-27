@@ -23,6 +23,7 @@ ONBUILD ARG BUILDDEPS
 ONBUILD ARG BUILDDEPS_UNTRUSTED
 ONBUILD ARG RUNDEPS
 ONBUILD ARG RUNDEPS_UNTRUSTED
+ONBUILD ARG INITCMDS
 ONBUILD ARG MAKEDIRS
 ONBUILD ARG MAKEFILES
 ONBUILD ARG GID0WRITABLESRECURSIVE
@@ -117,6 +118,10 @@ ONBUILD RUN chmod go= /environment \
          && find "$CONTENTDESTINATION2" -type f -perm +010 -exec chmod g-x "{}" + \
          && chmod u=rx,go= /buildfs/usr/local/bin/* || true \
          && cd /buildfs \
+         && if [ -n "$INITCMDS" ]; \
+            then \
+               eval "$INITCMDS || exit 1"; \
+            fi \
          && find * -type d ! -path 'tmp' ! -path 'var' ! -path 'run' ! -path 'var/tmp' ! -path 'var/run' -exec mkdir -m 750 "/imagefs/{}" + \
          && (find * ! -type d ! -type c -type l ! -path 'var/cache/*' ! -path 'tmp/*' -prune -exec echo -n "/{}>" \; -exec readlink "{}" \; && find * ! -type d ! -type c ! -type l ! -path 'var/cache/*' ! -path 'tmp/*' -prune -exec md5sum "{}" \; | awk '{first=$1; $1=""; print $0">"first}' | sed 's|^ |/|') | sort -u - > /tmp/onbuild/exclude.filelist.new \
          && comm -13 /tmp/onbuild/exclude.filelist /tmp/onbuild/exclude.filelist.new | awk -F '>' '{system("cp -a \"."$1"\" \"/imagefs/"$1"\"")}' \
