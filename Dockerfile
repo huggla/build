@@ -120,7 +120,6 @@ ONBUILD RUN chmod go= /environment \
          && cd /buildfs \
          && if [ -n "$INITCMDS" ]; \
             then \
-               ls -laR /buildfs; \
                eval "$INITCMDS || exit 1"; \
             fi \
          && find * -type d ! -path 'tmp' ! -path 'var' ! -path 'run' ! -path 'var/tmp' ! -path 'var/run' -exec mkdir -m 750 "/imagefs/{}" + \
